@@ -1,0 +1,12 @@
+{
+  "maintenance": "SOON",
+  "apikey": "API_KEY",
+  "bot": {
+    "token": "Token de votre bot !",
+    "guildid": "Serveur ou vous aller utilisée le bot",
+    "clientid": "Bot id"
+  },
+  "serveur": {
+    "adminid": "SOON"
+  }
+} 

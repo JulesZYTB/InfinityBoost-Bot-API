@@ -1,0 +1,22 @@
+{
+    "name": "infinityboost-bot-api",
+    "version": "1.0.0",
+    "description": "",
+    "main": "./index.js",
+    "bin": "./index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "node index.js"
+    },
+    "author": "BloumeGen et .^JulesZ^.",
+    "license": "ISC",
+    "dependencies": {
+        "@discordjs/builders": "^0.6.0",
+        "@discordjs/rest": "^0.1.0-canary.0",
+        "@discordjs/voice": "^0.16.0",
+        "axios": "^1.6.7",
+        "discord.js": "^13.1.0",
+        "dotenv": "^16.4.5",
+        "fs": "^0.0.1-security"
+    }
+}
