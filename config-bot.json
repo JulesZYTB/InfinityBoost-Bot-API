@@ -1,10 +1,10 @@
 {
   "maintenance": "SOON",
-  "apikey": "API_KEY",
+  "apikey": "InfinityBoostAPI_apikey",
   "bot": {
-    "token": "Token de votre bot !",
-    "guildid": "Serveur ou vous aller utilisée le bot",
-    "clientid": "Bot id"
+    "token": "token de votre bot discord",
+    "guildid": "guild id ",
+    "clientid": "client id du bot"
   },
   "serveur": {
     "adminid": "SOON"
