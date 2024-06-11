@@ -14,6 +14,13 @@ module.exports = {
               .setDescription("Guild ID de votre serveur Discord")
               .setRequired(true)
           )
+          .addIntegerOption(option => 
+            option.setName("type")
+              .setDescription("Utilisée votre stock ou le stock du site !")
+              .setRequired(true)
+              .addChoice("Stock site", 1)
+              .addChoice("Stock bot", 2)
+          )
         .addIntegerOption(option => {
             option.setName("nombre1")
                 .setDescription("Nombre de boosts pour votre serveur de 2 à 28")
@@ -40,14 +47,7 @@ module.exports = {
             option.setName("bio")
               .setDescription("Bio personnalisée pour les boosts")
               .setRequired(false)
-        )
-        .addIntegerOption(option => 
-            option.setName("type")
-              .setDescription("Utilisée votre stock ou le stock du site !")
-              .setRequired(true)
-              .addChoice("Stock site", 1)
-              .addChoice("Stock bot", 2)
-          ),
+        ),
 
     async execute(interaction) {
         await interaction.deferReply();
