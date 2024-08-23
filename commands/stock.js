@@ -14,8 +14,9 @@ module.exports = {
             optionr.setName("type")
                 .setDescription("Type de stock que vous voulais voir")
                 .setRequired(true)
-                .addChoice(`Site Web`, 1)
+                .addChoice(`Site Web InfinityBoost`, 1)
                 .addChoice(`Bot`, 2)
+                .addChoice(`Site web YOU`, 3)
         ) ,
     async execute(interaction, bot) {
         await interaction.deferReply({ });
@@ -24,26 +25,67 @@ module.exports = {
             if(type === 1) {
             const response = await axios.get(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&nombre=ALL&mode=STOCK`);
             if(response.data.erreur === 'APIKey invalide'){
+              const row = new MessageActionRow()
+                  .addComponents(
+                    new MessageButton()
+                      .setLabel('Add bot')
+                      .setURL(`https://panel.infinityboost.monster/`)
+                      .setStyle('LINK')
+                  );
             let non = new MessageEmbed()
             .setColor("#071b47")
             .setTitle("Erreur APIKey Invalid")
+            .setDescription("Votre APIKey est invalide acheter un plan ou génère une nouvelle API Key!")
             .setTimestamp()
             .setFooter("Bot developpé par BloumeGen")
 
-            return interaction.editReply({ embeds: [non] })
+            return interaction.editReply({ embeds: [non], components: [row] })
             } else {
             const stocks = response.data.stock;
             const message = response.data.message;
             let non = new MessageEmbed()
             .setColor("#071b47")
             .setTitle(`${message}`)
+            .setDescription("Stock du site pour des boosts")
             .addField('Stock', `${stocks} ♾️`)
             .setTimestamp()
             .setFooter("Bot developpé par BloumeGen")
 
             return interaction.editReply({ embeds: [non] })
         }
-     } else {
+     } else if(type === 3) {
+      const response = await axios.get(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&nombre=ALL&mode=STOCK&your_stock=yes`);
+      //console.log(response);
+      if(response.data.erreur === 'APIKey invalide'){
+        const row = new MessageActionRow()
+            .addComponents(
+              new MessageButton()
+                .setLabel('Add bot')
+                .setURL(`https://panel.infinityboost.monster/`)
+                .setStyle('LINK')
+            );
+      let non = new MessageEmbed()
+      .setColor("#071b47")
+      .setTitle("Erreur APIKey Invalid")
+      .setDescription("Votre APIKey est invalide acheter un plan ou génère une nouvelle API Key!")
+      .setTimestamp()
+      .setFooter("Bot developpé par BloumeGen")
+
+      return interaction.editReply({ embeds: [non], components: [row] })
+      } else {
+      const stocks = response.data.stock;
+      const message = response.data.message;
+      let non = new MessageEmbed()
+      .setColor("#071b47")
+      .setTitle(`${message}`)
+      .setDescription("Stock du site pour des boosts avec votre compte")
+      .addField('Stock', `${stocks} ♾️`)
+      .setTimestamp()
+      .setFooter("Bot developpé par BloumeGen")
+
+      return interaction.editReply({ embeds: [non] })
+      }
+  } else {
 
         const BoostFichier = '/stock/';
 

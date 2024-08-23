@@ -19,6 +19,7 @@ module.exports = {
               .setDescription("Utilisée votre stock ou le stock du site !")
               .setRequired(true)
               .addChoice("Stock site", 1)
+              .addChoice("Stock site YOU", 3)
               .addChoice("Stock bot", 2)
           )
         .addIntegerOption(option => {
@@ -52,6 +53,7 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
         const guildid = interaction.options.getString("guildid").toLowerCase().trim();
+        const bio = interaction.options.getString("bio").toLowerCase().trim();
         const nombre = interaction.options.getInteger("nombre1") || interaction.options.getInteger("nombre2");
         const type = interaction.options.getInteger("type");
 
@@ -62,19 +64,32 @@ module.exports = {
             return interaction.editReply('Veuillez fournir le nombre de boosts pour votre serveur.');
         }
 
-        if(type === 1) {
+        if(type === 1 || type === 3) {
         const responseuser = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=USER`, {}, {
             timeout: 1000000
         });
+        let your = "";
+        if (type === 3) {
+            your = "yes"; 
+        } else {
+            your = "no"; 
+        }
         if (responseuser.data.user !== interaction.user.username) {
+            const row = new MessageActionRow()
+                .addComponents(
+                    new MessageButton()
+                    .setLabel('Utilisée le panel')
+                    .setURL(`https://panel.infinityboost.monster/`)
+                    .setStyle('LINK')
+                );
             const embed = new MessageEmbed()
                 .setColor("#071b47")
                 .setTitle("Utilisation Interdit")
-                .setDescription("Puisque tu n'es pas l'utilisateur qui possède le Plan Obsidienne, tu ne peux pas utiliser cette commande.")
+                .setDescription("Puisque tu n'es pas l'utilisateur qui possède ce Plan Obsidienne, tu ne peux pas utiliser cette commande.")
                 .setTimestamp()
                 .setFooter("Bot développé par BloumeGen");
 
-            return interaction.editReply({ embeds: [embed] });
+            return interaction.editReply({ embeds: [embed], components: [row] });
         }
         try {
             let boostCounts = 0;
@@ -82,10 +97,11 @@ module.exports = {
 
             for (let i = 0; i < nombre / 2; i++) {
                 try {
-                    const response = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=BOOST&id=${guildid}`, {}, {
+                    const response = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=BOOST&id=${guildid}&bio=${bio}&your_stock=${your}`, {}, {
                         timeout: 1000000
                     });
-
+                    //console.log(response);
+                    //console.log(your);
                     if (response.data.erreur === 'APIKey invalide') {
                         const embed = new MessageEmbed()
                             .setColor("#071b47")
@@ -100,6 +116,7 @@ module.exports = {
                         const embed = new MessageEmbed()
                             .setColor("#071b47")
                             .setTitle("Hors Stock")
+                            .setDescription(`InfinityBoost n\'a plus de stock. Merci de patienter !`)
                             .setTimestamp()
                             .setFooter("Bot développé par BloumeGen");
 
@@ -107,6 +124,13 @@ module.exports = {
                     }
 
                     if (response.data.erreur === 'limite boost') {
+                        const row = new MessageActionRow()
+                        .addComponents(
+                          new MessageButton()
+                            .setLabel('Add bot')
+                            .setURL(`https://panel.infinityboost.monster/profile`)
+                            .setStyle('LINK')
+                        );
                         const embed = new MessageEmbed()
                             .setColor("#071b47")
                             .setTitle("Limite de boost depassée")
@@ -114,7 +138,7 @@ module.exports = {
                             .setTimestamp()
                             .setFooter("Bot développé par BloumeGen");
 
-                        return interaction.editReply({ embeds: [embed] });
+                        return interaction.editReply({ embeds: [embed], components: [row] });
                     }
                     if (response.data.erreur === 'bot') {
                         const row = new MessageActionRow()
@@ -161,7 +185,7 @@ module.exports = {
             await interaction.editReply({ embeds: [final] });
 
         } catch (error) {
-            console.log("Erreur API contact ADMIN Panel.Infinityboost.Monster", error);
+            console.log("Erreur API contact ADMIN Panel.Infinityboost.Monster n\ : ", error);
             const embed = new MessageEmbed()
             .setColor("#071b47")
             .setTitle("Erreur API")
@@ -175,7 +199,7 @@ module.exports = {
         const soon = new MessageEmbed()
         .setColor("#071b47")
         .setTitle("Boost avec votre stock")
-        .setDescription(`Pour le moment cette fonctionnalité n'est pas encore disponible merci de patienter ^pour une maj !`)
+        .setDescription(`Pour le moment cette fonctionnalité n'est pas encore disponible merci de patienter pour une maj !`)
         .setTimestamp()
         .setFooter("Bot développé par BloumeGen");
 
