@@ -80,6 +80,10 @@ module.exports = {
       .setTitle(`${message}`)
       .setDescription("Stock du site pour des boosts avec votre compte")
       .addField('Stock', `${stocks} ♾️`)
+      .addField(` Boost 1 Mois`, ` **${stocks}  boost**`)
+      .addField(` T0k3n N1tr0 1 Mois`, ` **${stocks / 2}  T0k3n**`)
+      .addField(` Boost 3 Mois`, ` **SOON boost**`)
+      .addField(` T0k3n N1tr0 3 Mois`, ` **SOON T0k3n**`)
       .setTimestamp()
       .setFooter("Bot developpé par BloumeGen")
 

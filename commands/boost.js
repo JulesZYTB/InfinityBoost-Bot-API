@@ -53,7 +53,7 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
         const guildid = interaction.options.getString("guildid").toLowerCase().trim();
-        const bio = interaction.options.getString("bio").toLowerCase().trim();
+        const bio = interaction.options.getString("bio").toLowerCase().trim() || "By JulesZ";
         const nombre = interaction.options.getInteger("nombre1") || interaction.options.getInteger("nombre2");
         const type = interaction.options.getInteger("type");
 
@@ -164,11 +164,28 @@ module.exports = {
                         boostCountsFailed++;
                     }
 
+                    
+                    function createProgressBar(current, total, barLength = 20) {
+                        const progress = Math.round((current / total) * barLength);
+                        const emptyProgress = barLength - progress;
+
+                        const progressText = '▬'.repeat(progress); 
+                        const emptyText = '▬'.repeat(emptyProgress); 
+                        const percentage = Math.round((current / total) * 100);
+
+                        return `[${progressText}${emptyText}] ${percentage}%`; 
+                    }
+
+                    
+                    const totalBoosts = nombre;
+                    const progressBar = createProgressBar(boostCounts, totalBoosts);
+
                     const update = new MessageEmbed()
-                        .setColor(0x000FF)
-                        .setTitle('Boost en cours')
-                        .setDescription(`Boost avec succès : ${boostCounts}/${nombre / 2}\nBoost échoués : ${boostCountsFailed}/${nombre / 2}`)
-                        .setTimestamp();
+                    .setColor('#0099ff') 
+                    .setTitle('🚀 **Boost en Cours** 🚀') 
+                    .setDescription(`🔹 Boosts réussis : **${boostCounts}/${totalBoosts}**\n🔸 Boosts échoués : **${boostCountsFailed}/${totalBoosts}**\n\n**Progression :**\n${progressBar}`)
+                    .setThumbnail('https://panel.infinityboost.monster/standard (3).gif') 
+                    
 
                     await interaction.editReply({ embeds: [update] });
                 } catch (error) {
