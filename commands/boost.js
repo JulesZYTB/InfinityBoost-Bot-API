@@ -4,7 +4,7 @@ const axios = require('axios');
 const config = require("../config-bot.json");
 
 let apikey = config.apikey;
-
+let clientbot = config.bot.clientid;
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("boost")
@@ -22,6 +22,11 @@ module.exports = {
               .addChoice("Stock site YOU", 3)
               .addChoice("Stock bot", 2)
           )
+          .addStringOption(option => 
+            option.setName("bio")
+              .setDescription("Bio personnalisée pour les boosts")
+              .setRequired(true)
+        )
         .addIntegerOption(option => {
             option.setName("nombre1")
                 .setDescription("Nombre de boosts pour votre serveur de 2 à 28")
@@ -43,17 +48,12 @@ module.exports = {
             }
 
             return option;
-        })   
-        .addStringOption(option => 
-            option.setName("bio")
-              .setDescription("Bio personnalisée pour les boosts")
-              .setRequired(false)
-        ),
+        }),
 
     async execute(interaction) {
         await interaction.deferReply();
         const guildid = interaction.options.getString("guildid").toLowerCase().trim();
-        const bio = interaction.options.getString("bio").toLowerCase().trim() || "By JulesZ";
+        const bio = interaction.options.getString("bio").toLowerCase().trim();
         const nombre = interaction.options.getInteger("nombre1") || interaction.options.getInteger("nombre2");
         const type = interaction.options.getInteger("type");
 
@@ -85,7 +85,8 @@ module.exports = {
             const embed = new MessageEmbed()
                 .setColor("#071b47")
                 .setTitle("Utilisation Interdit")
-                .setDescription("Puisque tu n'es pas l'utilisateur qui possède ce Plan Obsidienne, tu ne peux pas utiliser cette commande.")
+                .setDescription("Puisque tu n'es pas l'utilisateur qui possède ce Plan Obsidienne/API, tu ne peux pas utiliser cette commande.")
+                .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                 .setTimestamp()
                 .setFooter("Bot développé par BloumeGen");
 
@@ -94,7 +95,18 @@ module.exports = {
         try {
             let boostCounts = 0;
             let boostCountsFailed = 0;
+            function createProgressBar(current, total, barLength = 20) {
+                const progress = Math.round((current / total) * barLength);
+                const emptyProgress = barLength - progress;
 
+                const progressText = '▬'.repeat(progress); 
+                const emptyText = '▬'.repeat(emptyProgress); 
+                const percentage = Math.round((current / total) * 100);
+
+                return `[${progressText}${emptyText}] ${percentage}%`; 
+            }
+            const totalBoosts = nombre;
+            const progressBar = createProgressBar(boostCounts, totalBoosts);
             for (let i = 0; i < nombre / 2; i++) {
                 try {
                     const response = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=BOOST&id=${guildid}&bio=${bio}&your_stock=${your}`, {}, {
@@ -106,6 +118,7 @@ module.exports = {
                         const embed = new MessageEmbed()
                             .setColor("#071b47")
                             .setTitle("Erreur APIKey Invalid")
+                            .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
                             .setFooter("Bot développé par BloumeGen");
 
@@ -117,6 +130,7 @@ module.exports = {
                             .setColor("#071b47")
                             .setTitle("Hors Stock")
                             .setDescription(`InfinityBoost n\'a plus de stock. Merci de patienter !`)
+                            .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
                             .setFooter("Bot développé par BloumeGen");
 
@@ -135,6 +149,7 @@ module.exports = {
                             .setColor("#071b47")
                             .setTitle("Limite de boost depassée")
                             .setDescription(`Vous devez attendre ~1 jours pour refaire des boosts | Temps Recharge`)
+                            .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
                             .setFooter("Bot développé par BloumeGen");
 
@@ -145,13 +160,14 @@ module.exports = {
                         .addComponents(
                           new MessageButton()
                             .setLabel('Add bot')
-                            .setURL(`https://discord.com/api/oauth2/authorize?client_id=${response.data.clientid}&permissions=1099512155265&scope=bot&guild_id=${guildid}`)
+                            .setURL(`https://discord.com/api/oauth2/authorize?client_id=${clientbot}&permissions=1099512155265&scope=bot&guild_id=${guildid}`)
                             .setStyle('LINK')
                         );
                         const embed = new MessageEmbed()
                             .setColor("#071b47")
                             .setTitle("Invitée le bot")
                             .setDescription(`Le bot n'est pas dans le serveur que vous voulais booster donc il faut l'invitée !`)
+                            .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
                             .setFooter("Bot développé par BloumeGen");
 
@@ -165,27 +181,13 @@ module.exports = {
                     }
 
                     
-                    function createProgressBar(current, total, barLength = 20) {
-                        const progress = Math.round((current / total) * barLength);
-                        const emptyProgress = barLength - progress;
-
-                        const progressText = '▬'.repeat(progress); 
-                        const emptyText = '▬'.repeat(emptyProgress); 
-                        const percentage = Math.round((current / total) * 100);
-
-                        return `[${progressText}${emptyText}] ${percentage}%`; 
-                    }
-
-                    
-                    const totalBoosts = nombre;
-                    const progressBar = createProgressBar(boostCounts, totalBoosts);
 
                     const update = new MessageEmbed()
                     .setColor('#0099ff') 
                     .setTitle('🚀 **Boost en Cours** 🚀') 
                     .setDescription(`🔹 Boosts réussis : **${boostCounts}/${totalBoosts}**\n🔸 Boosts échoués : **${boostCountsFailed}/${totalBoosts}**\n\n**Progression :**\n${progressBar}`)
-                    .setThumbnail('https://panel.infinityboost.monster/standard (3).gif') 
-                    
+                    .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
+                    .setTimestamp();
 
                     await interaction.editReply({ embeds: [update] });
                 } catch (error) {
@@ -196,7 +198,8 @@ module.exports = {
             const final = new MessageEmbed()
                 .setColor(0x000FF)
                 .setTitle('Boost terminé')
-                .setDescription(`Boost avec succès : ${boostCounts}/${nombre / 2}\nBoost échoués : ${boostCountsFailed}/${nombre / 2}`)
+                .setDescription(`🔹 Boosts réussis : **${boostCounts}/${totalBoosts}**\n🔸 Boosts échoués : **${boostCountsFailed}/${totalBoosts}**\n\n**Progression :**\n${progressBar}`)
+                .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                 .setTimestamp();
 
             await interaction.editReply({ embeds: [final] });

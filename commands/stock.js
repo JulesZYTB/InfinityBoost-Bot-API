@@ -36,6 +36,7 @@ module.exports = {
             .setColor("#071b47")
             .setTitle("Erreur APIKey Invalid")
             .setDescription("Votre APIKey est invalide acheter un plan ou génère une nouvelle API Key!")
+            .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
             .setTimestamp()
             .setFooter("Bot developpé par BloumeGen")
 
@@ -47,7 +48,9 @@ module.exports = {
             .setColor("#071b47")
             .setTitle(`${message}`)
             .setDescription("Stock du site pour des boosts")
-            .addField('Stock', `${stocks} ♾️`)
+            .addField('Stock', `${stocks} boost 1 mois♾️`)
+            .addField('Stock', `SOON boost 3 mois♾️`)
+            .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
             .setTimestamp()
             .setFooter("Bot developpé par BloumeGen")
 
@@ -68,6 +71,7 @@ module.exports = {
       .setColor("#071b47")
       .setTitle("Erreur APIKey Invalid")
       .setDescription("Votre APIKey est invalide acheter un plan ou génère une nouvelle API Key!")
+      .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
       .setTimestamp()
       .setFooter("Bot developpé par BloumeGen")
 
@@ -79,7 +83,6 @@ module.exports = {
       .setColor("#071b47")
       .setTitle(`${message}`)
       .setDescription("Stock du site pour des boosts avec votre compte")
-      .addField('Stock', `${stocks} ♾️`)
       .addField(` Boost 1 Mois`, ` **${stocks}  boost**`)
       .addField(` T0k3n N1tr0 1 Mois`, ` **${stocks / 2}  T0k3n**`)
       .addField(` Boost 3 Mois`, ` **SOON boost**`)
