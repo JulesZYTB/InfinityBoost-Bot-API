@@ -87,6 +87,7 @@ module.exports = {
       .addField(` T0k3n N1tr0 1 Mois`, ` **${stocks / 2}  T0k3n**`)
       .addField(` Boost 3 Mois`, ` **SOON boost**`)
       .addField(` T0k3n N1tr0 3 Mois`, ` **SOON T0k3n**`)
+      .setImage('https://panel.infinityboost.monster/standard%20(3).gif')
       .setTimestamp()
       .setFooter("Bot developpé par BloumeGen")
 
@@ -130,6 +131,7 @@ module.exports = {
           .addField(` T0k3n N1tr0 1 Mois`, ` **${boostall} T0k3n**`)
           .addField(` Boost 3 Mois`, ` **${booster3} boost**`)
           .addField(` T0k3n N1tr0 3 Mois`, ` **${boostall2} T0k3n**`)
+          .setImage('https://panel.infinityboost.monster/standard%20(3).gif')
           .setTimestamp()
           .setFooter(`Bot developpé par BloumeGen`);
           return interaction.editReply({ embeds: [embed] });

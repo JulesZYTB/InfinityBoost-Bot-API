@@ -53,7 +53,7 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
         const guildid = interaction.options.getString("guildid").toLowerCase().trim();
-        const bio = interaction.options.getString("bio").toLowerCase().trim();
+        const bio = interaction.options.getString("bio");
         const nombre = interaction.options.getInteger("nombre1") || interaction.options.getInteger("nombre2");
         const type = interaction.options.getInteger("type");
 
@@ -95,25 +95,38 @@ module.exports = {
         try {
             let boostCounts = 0;
             let boostCountsFailed = 0;
+        
+            // Fonction pour créer la barre de progression
             function createProgressBar(current, total, barLength = 20) {
                 const progress = Math.round((current / total) * barLength);
                 const emptyProgress = barLength - progress;
-
-                const progressText = '▬'.repeat(progress); 
-                const emptyText = '▬'.repeat(emptyProgress); 
-                const percentage = Math.round((current / total) * 100);
-
-                return `[${progressText}${emptyText}] ${percentage}%`; 
+        
+                const progressText = '▬'.repeat(progress); // Progrès effectué
+                const emptyText = '░'.repeat(emptyProgress); // Progrès restant
+                const percentage = Math.round((current / total) * 100); // Calcul du pourcentage
+        
+                return `[${progressText}${emptyText}] ${percentage}%`; // Retourne la barre de progression et le pourcentage
             }
-            const totalBoosts = nombre;
-            const progressBar = createProgressBar(boostCounts, totalBoosts);
-            for (let i = 0; i < nombre / 2; i++) {
+        
+            const totalBoosts = nombre; // Le nombre total de boosts définis
+        
+            // Envoi d'un premier message avec la barre de progression à 0
+            const initialEmbed = new MessageEmbed()
+                .setColor('#0099ff')
+                .setTitle('🚀 **Boost en Cours** 🚀')
+                .setDescription(`🔹 Boosts réussis : **0/${totalBoosts}**\n🔸 Boosts échoués : **0/${totalBoosts}**\n\n**Progression :**\n${createProgressBar(0, totalBoosts)}`)
+                .setImage('https://panel.infinityboost.monster/standard%20(3).gif')
+                .setTimestamp();
+        
+            const progressMessage = await interaction.editReply({ embeds: [initialEmbed] });
+        
+            for (let i = 0; i < totalBoosts / 2; i++) { // Itération pour chaque boost
                 try {
                     const response = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=BOOST&id=${guildid}&bio=${bio}&your_stock=${your}`, {}, {
-                        timeout: 1000000
+                        timeout: 1000000 // Timeout pour la requête
                     });
-                    //console.log(response);
-                    //console.log(your);
+        
+                    // Vérification des erreurs renvoyées par l'API
                     if (response.data.erreur === 'APIKey invalide') {
                         const embed = new MessageEmbed()
                             .setColor("#071b47")
@@ -121,10 +134,10 @@ module.exports = {
                             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
                             .setFooter("Bot développé par BloumeGen");
-
+        
                         return interaction.editReply({ embeds: [embed] });
                     }
-
+        
                     if (response.data.erreur === 'hors stock') {
                         const embed = new MessageEmbed()
                             .setColor("#071b47")
@@ -133,18 +146,18 @@ module.exports = {
                             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
                             .setFooter("Bot développé par BloumeGen");
-
+        
                         return interaction.editReply({ embeds: [embed] });
                     }
-
+        
                     if (response.data.erreur === 'limite boost') {
                         const row = new MessageActionRow()
-                        .addComponents(
-                          new MessageButton()
-                            .setLabel('Add bot')
-                            .setURL(`https://panel.infinityboost.monster/profile`)
-                            .setStyle('LINK')
-                        );
+                            .addComponents(
+                                new MessageButton()
+                                    .setLabel('Add bot')
+                                    .setURL(`https://panel.infinityboost.monster/profile`)
+                                    .setStyle('LINK')
+                            );
                         const embed = new MessageEmbed()
                             .setColor("#071b47")
                             .setTitle("Limite de boost depassée")
@@ -152,69 +165,76 @@ module.exports = {
                             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
                             .setFooter("Bot développé par BloumeGen");
-
+        
                         return interaction.editReply({ embeds: [embed], components: [row] });
                     }
+        
                     if (response.data.erreur === 'bot') {
                         const row = new MessageActionRow()
-                        .addComponents(
-                          new MessageButton()
-                            .setLabel('Add bot')
-                            .setURL(`https://discord.com/api/oauth2/authorize?client_id=${clientbot}&permissions=1099512155265&scope=bot&guild_id=${guildid}`)
-                            .setStyle('LINK')
-                        );
+                            .addComponents(
+                                new MessageButton()
+                                    .setLabel('Add bot')
+                                    .setURL(`https://discord.com/api/oauth2/authorize?client_id=${clientbot}&permissions=1099512155265&scope=bot&guild_id=${guildid}`)
+                                    .setStyle('LINK')
+                            );
                         const embed = new MessageEmbed()
                             .setColor("#071b47")
                             .setTitle("Invitée le bot")
-                            .setDescription(`Le bot n'est pas dans le serveur que vous voulais booster donc il faut l'invitée !`)
+                            .setDescription(`Le bot n'est pas dans le serveur que vous voulez booster, donc il faut l'inviter !`)
                             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
                             .setFooter("Bot développé par BloumeGen");
-
+        
                         return interaction.editReply({ embeds: [embed], components: [row] });
                     }
-
+        
+                    // Gestion des boosts réussis
                     if (response.data.erreur === 'Success') {
-                        boostCounts++;
+                        boostCounts++; // Incrémenter si succès
                     } else if (response.data.erreur === 'Erreur boost') {
-                        boostCountsFailed++;
+                        boostCountsFailed++; // Incrémenter si échec
                     }
-
-                    
-
-                    const update = new MessageEmbed()
-                    .setColor('#0099ff') 
-                    .setTitle('🚀 **Boost en Cours** 🚀') 
-                    .setDescription(`🔹 Boosts réussis : **${boostCounts}/${totalBoosts}**\n🔸 Boosts échoués : **${boostCountsFailed}/${totalBoosts}**\n\n**Progression :**\n${progressBar}`)
-                    .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
-                    .setTimestamp();
-
-                    await interaction.editReply({ embeds: [update] });
+        
+                    // Mise à jour du message avec la progression des boosts
+                    const updateEmbed = new MessageEmbed()
+                        .setColor('#0099ff')
+                        .setTitle('🚀 **Boost en Cours** 🚀')
+                        .setDescription(`🔹 Boosts réussis : **${boostCounts * 2}/${totalBoosts}**\n🔸 Boosts échoués : **${boostCountsFailed * 2}/${totalBoosts}**\n\n**Progression :**\n${createProgressBar((boostCounts + boostCountsFailed) * 2, totalBoosts)}`)
+                        .setImage('https://panel.infinityboost.monster/standard%20(3).gif')
+                        .setTimestamp();
+        
+                    // Mise à jour du message avec l'embed mis à jour
+                    await progressMessage.edit({ embeds: [updateEmbed] });
+        
                 } catch (error) {
+                    boostCountsFailed++; // Compter comme échec en cas d'erreur
                     console.log("Erreur API contact ADMIN Panel.Infinityboost.Monster", error);
                 }
             }
-
-            const final = new MessageEmbed()
+        
+            // Message final une fois les boosts terminés
+            const finalEmbed = new MessageEmbed()
                 .setColor(0x000FF)
                 .setTitle('Boost terminé')
-                .setDescription(`🔹 Boosts réussis : **${boostCounts}/${totalBoosts}**\n🔸 Boosts échoués : **${boostCountsFailed}/${totalBoosts}**\n\n**Progression :**\n${progressBar}`)
+                .setDescription(`🔹 Boosts réussis : **${boostCounts * 2}/${totalBoosts}**\n🔸 Boosts échoués : **${boostCountsFailed * 2}/${totalBoosts}**\n\n**Progression :**\n${createProgressBar((boostCounts + boostCountsFailed) * 2, totalBoosts)}`)
                 .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                 .setTimestamp();
-
-            await interaction.editReply({ embeds: [final] });
-
+        
+            await interaction.editReply({ embeds: [finalEmbed] });
+        
         } catch (error) {
-            console.log("Erreur API contact ADMIN Panel.Infinityboost.Monster n\ : ", error);
+            console.log("Erreur API contact ADMIN Panel.Infinityboost.Monster", error);
             const embed = new MessageEmbed()
-            .setColor("#071b47")
-            .setTitle("Erreur API")
-            .setDescription(`Contact InfinityBoost !`)
-            .setTimestamp()
-            .setFooter("Bot développé par BloumeGen");
-
-        return interaction.editReply({ embeds: [embed] });
+                .setColor("#071b47")
+                .setTitle("Erreur API")
+                .setDescription(`Contactez InfinityBoost !`)
+                .setTimestamp()
+                .setFooter("Bot développé par BloumeGen");
+        
+            return interaction.editReply({ embeds: [embed] });
         }
+        
+        
     } else {
         const soon = new MessageEmbed()
         .setColor("#071b47")
