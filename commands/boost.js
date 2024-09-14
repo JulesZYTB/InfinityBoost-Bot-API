@@ -20,7 +20,6 @@ module.exports = {
               .setRequired(true)
               .addChoice("Stock site", 1)
               .addChoice("Stock site YOU", 3)
-              .addChoice("Stock bot", 2)
           )
           .addStringOption(option => 
             option.setName("bio")
@@ -161,7 +160,7 @@ module.exports = {
                         const embed = new MessageEmbed()
                             .setColor("#071b47")
                             .setTitle("Limite de boost depassée")
-                            .setDescription(`Vous devez attendre ~1 jours pour refaire des boosts | Temps Recharge`)
+                            .setDescription(`Vous devez attendre ~1 jours pour refaire des boosts | Temps Recharge\n\n 🔹 Boosts réussis : **0/${totalBoosts}**\n🔸 Boosts échoués : **0/${totalBoosts}**\n\n**Progression :**\n${createProgressBar(0, totalBoosts)}`)
                             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
                             .setFooter("Bot développé par BloumeGen");
@@ -177,10 +176,11 @@ module.exports = {
                                     .setURL(`https://discord.com/api/oauth2/authorize?client_id=${clientbot}&permissions=1099512155265&scope=bot&guild_id=${guildid}`)
                                     .setStyle('LINK')
                             );
+                        
                         const embed = new MessageEmbed()
                             .setColor("#071b47")
                             .setTitle("Invitée le bot")
-                            .setDescription(`Le bot n'est pas dans le serveur que vous voulez booster, donc il faut l'inviter !`)
+                            .setDescription(`Le bot n'est pas dans le serveur que vous voulez booster, donc il faut l'inviter !\n\n 🔹 Boosts réussis : **0/${totalBoosts}**\n🔸 Boosts échoués : **0/${totalBoosts}**\n\n**Progression :**\n${createProgressBar(0, totalBoosts)}`)
                             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
                             .setFooter("Bot développé par BloumeGen");
@@ -235,15 +235,6 @@ module.exports = {
         }
         
         
-    } else {
-        const soon = new MessageEmbed()
-        .setColor("#071b47")
-        .setTitle("Boost avec votre stock")
-        .setDescription(`Pour le moment cette fonctionnalité n'est pas encore disponible merci de patienter pour une maj !`)
-        .setTimestamp()
-        .setFooter("Bot développé par BloumeGen");
-
-    return interaction.editReply({ embeds: [soon] });
-    }
+        }
     }
 };
