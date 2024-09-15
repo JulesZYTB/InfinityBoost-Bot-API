@@ -7,15 +7,16 @@ const { Routes } = require("discord-api-types/v9");
 const config = require("./config-bot.json");
 const gradient = require('gradient-string');
 const figlet = require('figlet');
-
+(async () => {
+  //Code by JulesZ .
 const text = 'InfinityBoost Bot API';
 
 figlet(text, function(err, asciiArt) {
   console.log(gradient.rainbow(asciiArt));
   console.log(gradient.rainbow("InfinityBoost Bot API par ") +"BloumeGen et JulesZ");
-  console.log(gradient.rainbow("InfinityBoost Bot API Version ") + "b1.1");
+  console.log(gradient.rainbow("InfinityBoost Bot API Version ") + "V1.1");
 });
-
+await new Promise((resolve) => setTimeout(resolve, 1000));
 let guild = config.bot.guildid;
 let client = config.bot.clientid;
 
@@ -41,7 +42,7 @@ const rest = new REST({ version: "9" }).setToken(config.bot.token);
     console.error(error);
   }
 })();
-
+await new Promise((resolve) => setTimeout(resolve, 1000));
 const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, , Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES] });
 bot.commands = new Collection();
 
@@ -58,7 +59,7 @@ for (const file of commandFiles) {
 
 bot.on("ready", () => {
     console.log(`Le bot ${bot.user.tag} pour les slash commands est connecté`);
-    var items = ['InfinityBoost APIKey by JulesZ', 'InfinityBoost APIKey dev by JulesZ']; //Merci de pas edit ca peut vraiment nous aider !
+    var items = ['InfinityBoost API by JulesZ', 'InfinityBoost API dev by JulesZ', '.gg/InfinityBoost API dev by JulesZ']; //Merci de pas edit ca peut vraiment nous aider !
 
     var stats = ['online'];
  
@@ -92,3 +93,4 @@ bot.on("ready", () => {
 });
 
 bot.login(config.bot.token);
+})();

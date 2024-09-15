@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
 const axios = require('axios');
 const config = require("../config-bot.json");
-
+//Code by JulesZ .
 let apikey = config.apikey;
 let clientbot = config.bot.clientid;
 module.exports = {
@@ -136,7 +136,26 @@ module.exports = {
         
                         return interaction.editReply({ embeds: [embed] });
                     }
-        
+
+                    if(response.data.erreur === 'only API'){
+                        const row = new MessageActionRow()
+                            .addComponents(
+                              new MessageButton()
+                                .setLabel('Voir le site')
+                                .setURL(`https://panel.infinityboost.monster/`)
+                                .setStyle('LINK')
+                            );
+                      let non = new MessageEmbed()
+                      .setColor("#071b47")
+                      .setTitle("Erreur only API")
+                      .setDescription("Votre APIKey ne peut utiliser que votre stock et non celui de InfinityBoost !")
+                      .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
+                      .setTimestamp()
+                      .setFooter("Bot developpé par BloumeGen")
+          
+                      return interaction.editReply({ embeds: [non], components: [row] })
+                      }
+
                     if (response.data.erreur === 'hors stock') {
                         const embed = new MessageEmbed()
                             .setColor("#071b47")

@@ -5,7 +5,7 @@ const axios = require('axios');
 const fs = require("fs");
 const path = require("path");
 let apikey = config.apikey;
-
+//Code by JulesZ .
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("stock")
@@ -27,7 +27,7 @@ module.exports = {
               const row = new MessageActionRow()
                   .addComponents(
                     new MessageButton()
-                      .setLabel('Add bot')
+                      .setLabel('Voir le site')
                       .setURL(`https://panel.infinityboost.monster/`)
                       .setStyle('LINK')
                   );
@@ -40,7 +40,24 @@ module.exports = {
             .setFooter("Bot developpé par BloumeGen")
 
             return interaction.editReply({ embeds: [non], components: [row] })
-            } else {
+            } else if(response.data.erreur === 'only API'){
+                const row = new MessageActionRow()
+                    .addComponents(
+                      new MessageButton()
+                        .setLabel('Voir le site')
+                        .setURL(`https://panel.infinityboost.monster/`)
+                        .setStyle('LINK')
+                    );
+              let non = new MessageEmbed()
+              .setColor("#071b47")
+              .setTitle("Erreur only API")
+              .setDescription("Votre APIKey ne peut utiliser que votre stock et non celui de InfinityBoost !")
+              .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
+              .setTimestamp()
+              .setFooter("Bot developpé par BloumeGen")
+  
+              return interaction.editReply({ embeds: [non], components: [row] })
+              } else {
             const stocks = response.data.stock;
             const message = response.data.message;
             let non = new MessageEmbed()
@@ -64,7 +81,7 @@ module.exports = {
         const row = new MessageActionRow()
             .addComponents(
               new MessageButton()
-                .setLabel('Add bot')
+                .setLabel('Voir le site')
                 .setURL(`https://panel.infinityboost.monster/`)
                 .setStyle('LINK')
             );
@@ -72,6 +89,23 @@ module.exports = {
       .setColor("#071b47")
       .setTitle("Erreur APIKey Invalid")
       .setDescription("Votre APIKey est invalide acheter un plan ou génère une nouvelle API Key!")
+      .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
+      .setTimestamp()
+      .setFooter("Bot developpé par BloumeGen")
+
+      return interaction.editReply({ embeds: [non], components: [row] })
+      } else if(response.data.erreur === 'only API'){
+        const row = new MessageActionRow()
+            .addComponents(
+              new MessageButton()
+                .setLabel('Voir le site')
+                .setURL(`https://panel.infinityboost.monster/`)
+                .setStyle('LINK')
+            );
+      let non = new MessageEmbed()
+      .setColor("#071b47")
+      .setTitle("Erreur only API")
+      .setDescription("Votre APIKey ne peut utiliser que votre stock et non celui de InfinityBoost !")
       .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
       .setTimestamp()
       .setFooter("Bot developpé par BloumeGen")

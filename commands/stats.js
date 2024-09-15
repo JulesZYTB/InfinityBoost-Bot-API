@@ -4,8 +4,7 @@ const version = "2.0.5";
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageEmbed } = require("discord.js");
 const config = require("../config-bot.json");
-
-// Store the bot's startup time
+//Code by JulesZ .
 const botStartTime = Date.now();
 
 module.exports = {
