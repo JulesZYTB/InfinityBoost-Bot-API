@@ -73,6 +73,24 @@ module.exports = {
         const responseuser = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=USER&your_stock=${your}`, {}, {
             timeout: 1000000
         });
+        if(responseuser.data.erreur === 'only API'){
+            const row = new MessageActionRow()
+                .addComponents(
+                  new MessageButton()
+                    .setLabel('Voir le site')
+                    .setURL(`https://panel.infinityboost.monster/`)
+                    .setStyle('LINK')
+                );
+          let non = new MessageEmbed()
+          .setColor("#071b47")
+          .setTitle("Erreur only API")
+          .setDescription("Votre APIKey ne peut utiliser que votre stock et non celui de InfinityBoost !")
+          .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
+          .setTimestamp()
+          .setFooter("Bot developpé par BloumeGen")
+
+          return interaction.editReply({ embeds: [non], components: [row] })
+          }
         if (responseuser.data.user !== interaction.user.username) {
             const row = new MessageActionRow()
                 .addComponents(
