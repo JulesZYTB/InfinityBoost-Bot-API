@@ -18,7 +18,7 @@ module.exports = {
                 .addChoice(`Site web YOU`, 2)
         ) ,
     async execute(interaction, bot) {
-        await interaction.deferReply({ });
+        await interaction.deferReply();
         try {
             const type = interaction.options.getInteger("type");
             if(type === 1) {
