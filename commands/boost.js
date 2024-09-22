@@ -73,7 +73,16 @@ module.exports = {
         const responseuser = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=USER&your_stock=${your}`, {}, {
             timeout: 1000000
         });
-        if(responseuser.data.erreur === 'only API'){
+        if (responseuser.data.erreur === 'APIKey invalide') {
+            const embed = new MessageEmbed()
+                .setColor("#071b47")
+                .setTitle("Erreur APIKey Invalid")
+                .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
+                .setTimestamp()
+                .setFooter("Bot développé par BloumeGen");
+
+            return interaction.editReply({ embeds: [embed] });
+        } else if(responseuser.data.erreur === 'only API'){
             const row = new MessageActionRow()
                 .addComponents(
                   new MessageButton()
@@ -90,8 +99,7 @@ module.exports = {
           .setFooter("Bot developpé par BloumeGen")
 
           return interaction.editReply({ embeds: [non], components: [row] })
-          }
-        if (responseuser.data.user !== interaction.user.username) {
+          } else if (responseuser.data.user !== interaction.user.username) {
             const row = new MessageActionRow()
                 .addComponents(
                     new MessageButton()
