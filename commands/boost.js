@@ -64,15 +64,15 @@ module.exports = {
         }
 
         if(type === 1 || type === 3) {
-        const responseuser = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=USER`, {}, {
-            timeout: 1000000
-        });
         let your = "";
         if (type === 3) {
             your = "yes"; 
         } else {
             your = "no"; 
         }
+        const responseuser = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=USER&your_stock=${your}`, {}, {
+            timeout: 1000000
+        });
         if (responseuser.data.user !== interaction.user.username) {
             const row = new MessageActionRow()
                 .addComponents(
