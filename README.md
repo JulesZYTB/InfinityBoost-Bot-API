@@ -33,9 +33,10 @@ Offres BloumeGen Bot API:
 
 ### Commandes
 
-* /boost (guildid:) (nombre1:) (nombre2:) (bio: SOON) - Booster via l'api ou avec votre stock soon
-* /stock - Voir le stock du site ou du bot
+* /boost (guildid:) (type:) (nombre1:) (nombre2:) (bio: SOON) - Booster via l'api ou avec votre stock soon
+* /stock - (type:) Voir le stock du site ou du bot
 * /stats - Voir les stats du bot
+* /send - (type:) - crée un lien pour send les tokens du stock de votre comptes .
 * /leave - Faire quittée le bot boost de tout les serveur qu'il a sauf lui des cmd
   
 ### Info pour votre stock
