@@ -13,8 +13,8 @@ const text = 'InfinityBoost Bot API';
 
 figlet(text, function(err, asciiArt) {
   console.log(gradient.rainbow(asciiArt));
-  console.log(gradient.rainbow("InfinityBoost Bot API par ") +"BloumeGen et JulesZ");
-  console.log(gradient.rainbow("InfinityBoost Bot API Version ") + "V1.1");
+  console.log(gradient.rainbow("InfinityBoost Bot API par ") +"JulesZ");
+  console.log(gradient.rainbow("InfinityBoost Bot API Version ") + "V1.4");
 });
 await new Promise((resolve) => setTimeout(resolve, 1000));
 let guild = config.bot.guildid;
@@ -59,7 +59,7 @@ for (const file of commandFiles) {
 
 bot.on("ready", () => {
     console.log(`Le bot ${bot.user.tag} pour les slash commands est connecté`);
-    var items = ['InfinityBoost API by JulesZ', 'InfinityBoost API dev by JulesZ', '.gg/InfinityBoost API dev by JulesZ']; //Merci de pas edit ca peut vraiment nous aider !
+    var items = ['InfinityBoost API by JulesZ - bloumechat.com', '.gg/InfinityBoost API dev by JulesZ - bloumechat.com', '.gg/InfinityBoost API dev by JulesZ - bloumechat.com']; //Merci de pas edit ca peut vraiment nous aider !
 
     var stats = ['online'];
  
