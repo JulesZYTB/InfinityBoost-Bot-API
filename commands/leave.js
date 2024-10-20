@@ -30,7 +30,7 @@ module.exports = {
                 .setDescription("Puisque tu n'es pas l'utilisateur qui possède ce Plan Obsidienne/API, tu ne peux pas utiliser cette commande.")
                 .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                 .setTimestamp()
-                .setFooter("Bot développé par BloumeGen");
+                .setFooter("Bot développé par JulesZ");
 
             return interaction.editReply({ embeds: [embed], components: [row] });
         }

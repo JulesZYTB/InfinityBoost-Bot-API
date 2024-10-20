@@ -79,7 +79,7 @@ module.exports = {
                 .setTitle("Erreur APIKey Invalid")
                 .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                 .setTimestamp()
-                .setFooter("Bot développé par BloumeGen");
+                .setFooter("Bot développé par JulesZ");
 
             return interaction.editReply({ embeds: [embed] });
         } else if(responseuser.data.erreur === 'only API'){
@@ -96,7 +96,7 @@ module.exports = {
           .setDescription("Votre APIKey ne peut utiliser que votre stock et non celui de InfinityBoost !")
           .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
           .setTimestamp()
-          .setFooter("Bot developpé par BloumeGen")
+          .setFooter("Bot développé par JulesZ")
 
           return interaction.editReply({ embeds: [non], components: [row] })
           } else if (responseuser.data.user !== interaction.user.username) {
@@ -113,7 +113,7 @@ module.exports = {
                 .setDescription("Puisque tu n'es pas l'utilisateur qui possède ce Plan Obsidienne/API, tu ne peux pas utiliser cette commande.")
                 .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                 .setTimestamp()
-                .setFooter("Bot développé par BloumeGen");
+                .setFooter("Bot développé par JulesZ");
 
             return interaction.editReply({ embeds: [embed], components: [row] });
         }
@@ -158,7 +158,7 @@ module.exports = {
                             .setTitle("Erreur APIKey Invalid")
                             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
-                            .setFooter("Bot développé par BloumeGen");
+                            .setFooter("Bot développé par JulesZ");
         
                         return interaction.editReply({ embeds: [embed] });
                     }
@@ -177,7 +177,7 @@ module.exports = {
                       .setDescription("Votre APIKey ne peut utiliser que votre stock et non celui de InfinityBoost !")
                       .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                       .setTimestamp()
-                      .setFooter("Bot developpé par BloumeGen")
+                      .setFooter("Bot développé par JulesZ")
           
                       return interaction.editReply({ embeds: [non], components: [row] })
                       }
@@ -189,7 +189,7 @@ module.exports = {
                             .setDescription(`InfinityBoost n\'a plus de stock. Merci de patienter !`)
                             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
-                            .setFooter("Bot développé par BloumeGen");
+                            .setFooter("Bot développé par JulesZ");
         
                         return interaction.editReply({ embeds: [embed] });
                     }
@@ -208,7 +208,7 @@ module.exports = {
                             .setDescription(`Vous devez attendre ~1 jours pour refaire des boosts | Temps Recharge\n\n 🔹 Boosts réussis : **0/${totalBoosts}**\n🔸 Boosts échoués : **0/${totalBoosts}**\n\n**Progression :**\n${createProgressBar(0, totalBoosts)}`)
                             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
-                            .setFooter("Bot développé par BloumeGen");
+                            .setFooter("Bot développé par JulesZ");
         
                         return interaction.editReply({ embeds: [embed], components: [row] });
                     }
@@ -228,7 +228,7 @@ module.exports = {
                             .setDescription(`Le bot n'est pas dans le serveur que vous voulez booster, donc il faut l'inviter !\n\n 🔹 Boosts réussis : **0/${totalBoosts}**\n🔸 Boosts échoués : **0/${totalBoosts}**\n\n**Progression :**\n${createProgressBar(0, totalBoosts)}`)
                             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                             .setTimestamp()
-                            .setFooter("Bot développé par BloumeGen");
+                            .setFooter("Bot développé par JulesZ");
         
                         return interaction.editReply({ embeds: [embed], components: [row] });
                     }
@@ -274,7 +274,7 @@ module.exports = {
                 .setTitle("Erreur API")
                 .setDescription(`Contactez InfinityBoost !`)
                 .setTimestamp()
-                .setFooter("Bot développé par BloumeGen");
+                .setFooter("Bot développé par JulesZ");
         
             return interaction.editReply({ embeds: [embed] });
         }

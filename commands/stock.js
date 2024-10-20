@@ -37,7 +37,7 @@ module.exports = {
             .setDescription("Votre APIKey est invalide acheter un plan ou génère une nouvelle API Key!")
             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
             .setTimestamp()
-            .setFooter("Bot developpé par BloumeGen")
+            .setFooter("Bot développé par JulesZ")
 
             return interaction.editReply({ embeds: [non], components: [row] })
             } else if(response.data.erreur === 'only API'){
@@ -54,7 +54,7 @@ module.exports = {
               .setDescription("Votre APIKey ne peut utiliser que votre stock et non celui de InfinityBoost !")
               .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
               .setTimestamp()
-              .setFooter("Bot developpé par BloumeGen")
+              .setFooter("Bot développé par JulesZ")
   
               return interaction.editReply({ embeds: [non], components: [row] })
               } else {
@@ -70,7 +70,7 @@ module.exports = {
             .addField(` T0k3n N1tr0 3 Mois`, ` **SOON T0k3n**`)
             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
             .setTimestamp()
-            .setFooter("Bot developpé par BloumeGen")
+            .setFooter("Bot développé par JulesZ")
 
             return interaction.editReply({ embeds: [non] })
         }
@@ -91,7 +91,7 @@ module.exports = {
       .setDescription("Votre APIKey est invalide acheter un plan ou génère une nouvelle API Key!")
       .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
       .setTimestamp()
-      .setFooter("Bot developpé par BloumeGen")
+      .setFooter("Bot développé par JulesZ")
 
       return interaction.editReply({ embeds: [non], components: [row] })
       } else if(response.data.erreur === 'only API'){
@@ -108,7 +108,7 @@ module.exports = {
       .setDescription("Votre APIKey ne peut utiliser que votre stock et non celui de InfinityBoost !")
       .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
       .setTimestamp()
-      .setFooter("Bot developpé par BloumeGen")
+      .setFooter("Bot développé par JulesZ")
 
       return interaction.editReply({ embeds: [non], components: [row] })
       } else {
@@ -124,7 +124,7 @@ module.exports = {
       .addField(` T0k3n N1tr0 3 Mois`, ` **SOON T0k3n**`)
       .setImage('https://panel.infinityboost.monster/standard%20(3).gif')
       .setTimestamp()
-      .setFooter("Bot developpé par BloumeGen")
+      .setFooter("Bot développé par JulesZ")
 
       return interaction.editReply({ embeds: [non] })
       }
