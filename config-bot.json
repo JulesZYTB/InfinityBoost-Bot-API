@@ -8,5 +8,8 @@
   },
   "serveur": {
     "adminid": "SOON"
+  },
+  "autobuy": {
+    "port": 00000
   }
 } 
