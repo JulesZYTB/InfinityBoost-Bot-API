@@ -47,6 +47,11 @@ Offres BloumeGen Bot API:
 
 * Aller dans le fichier `config.json` et mettez le token de votre bot
 * Toujours dans le fichier `config.json` dans `apikey`mettez votre apikey pour que le bot work
+* apikey_sellauth, shop_id_sellauth : https://dash.sellauth.com/api
+* discord_webhook_url : Crée un webhook pour les logs des commandes passer.
+* port : Mettre le port de votre pterodactyl si vous êtes sur un pterodactyl.
+* Crée un produit simple (non variable) : options de livraison mettre dynamic, puis mettre votre ip ou host + port, mettre comme nom de produit [Nombre de boost par commande] boost 1 mois (Voir exemple).
+* <img src="https://media.bloumechat.com/media/CAjrolIq7N.png" alt="exemple" /> <img src="https://media.bloumechat.com/media/CAjrolIq7N.png" alt="exemple" />
 * ```
   {
     "maintenance": "SOON",
