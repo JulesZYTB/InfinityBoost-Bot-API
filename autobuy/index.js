@@ -136,7 +136,7 @@ const server = http.createServer((req, res) => {
                 }
             }
             if (boostCounts > 0) {
-                await sendDiscordNotification(`Nouvelle commande passée : \nInvoice ID: ${invoice_id}\nEmail: ${email}\nMontant: ${amount}\nBoost unitaire: ${unitPrice}\nTotal: ${totalPrice}\nPrix Total: ${price}\nGateway: ${gateway}`);
+                await sendDiscordNotification(`Nouvelle commande passée : \nInvoice ID: ${invoice_id}\nEmail: ${email}\nMontant: ${amount}\nBoost unitaire: ${unitPrice}\nTotal: ${totalPrice}\nPrix Total: ${price}€\nGateway: ${gateway}`);
                 console.log(`Tous les boosts ont été livrés, invoice_id: ${invoice_id}.`);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 return res.end(JSON.stringify({ message: 'Tous les boosts ont été livrés avec succès !' }));
