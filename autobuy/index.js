@@ -37,7 +37,7 @@ const server = http.createServer((req, res) => {
 
             // Extraire les informations nécessaires
             const { status, email, gateway } = queryParams;
-            let price = parseInt(queryParams.price, 10);
+            let price = parseFloat(queryParams.price);
             let invoice_id = parseInt(queryParams.invoice_id, 10);
             let productId = parseInt(queryParams.product_id, 10);
             let amount = parseInt(queryParams.amount, 10) || 1;
@@ -122,10 +122,12 @@ const server = http.createServer((req, res) => {
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         return res.end(JSON.stringify({ message: 'Le bot n\'est pas dans votre serveur, contactez-nous.' }));
                     }
-        
+                    
                     // Gestion des boosts réussis
                     if (response.data.erreur === 'Success') {
-                        boostCounts++; 
+                        boostCounts++;
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ message: 'Tous les boosts ont été livrés avec succès ou en cours de livraison dans -1 minutes !' }));
                     } else if (response.data.erreur === 'Erreur boost') {
                         boostCountsFailed++;
                     }
@@ -136,12 +138,12 @@ const server = http.createServer((req, res) => {
                 }
             }
             if (boostCounts > 0) {
-                await sendDiscordNotification(`Nouvelle commande passée : \nInvoice ID: ${invoice_id}\nEmail: ${email}\nMontant: ${amount}\nBoost unitaire: ${unitPrice}\nTotal: ${totalPrice}\nPrix Total: ${price}€\nGateway: ${gateway}`);
+                await sendDiscordNotification(`Nouvelle commande passée : \nInvoice ID: ${invoice_id}\nEmail: ${email}\nNombre Acheter: ${amount}\nNombre Boost Total: ${unitPrice}\nTotal: ${totalPrice}\nPrix Total: ${price}€\nGateway: ${gateway}`);
                 console.log(`Tous les boosts ont été livrés, invoice_id: ${invoice_id}.`);
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                return res.end(JSON.stringify({ message: 'Tous les boosts ont été livrés avec succès !' }));
+                return;
             } 
         } catch (error) {
+            console.log(error);
             // Réponse en cas d'erreur
             res.writeHead(500, { 'Content-Type': 'application/json' });
             return res.end(JSON.stringify({ error: 'Erreur interne du serveur' }));
