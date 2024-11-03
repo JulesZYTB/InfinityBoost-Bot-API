@@ -51,7 +51,7 @@ Offres BloumeGen Bot API:
 * discord_webhook_url : Crée un webhook pour les logs des commandes passer.
 * port : Mettre le port de votre pterodactyl si vous êtes sur un pterodactyl.
 * Crée un produit simple (non variable) : options de livraison mettre dynamic, puis mettre votre ip ou host + port, mettre comme nom de produit [Nombre de boost par commande] boost 1 mois (Voir exemple).
-* <img src="https://media.bloumechat.com/media/CAjrolIq7N.png" alt="exemple" /> <img src="https://media.bloumechat.com/media/CAjrolIq7N.png" alt="exemple" />
+* <img src="https://media.bloumechat.com/media/CAjrolIq7N.png" alt="exemple" /> <img src="https://media.bloumechat.com/media/TbhEtnkVWS.png" alt="exemple" />
 * ```
   {
     "maintenance": "SOON",
