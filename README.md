@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://api.bloume-gen.tk/assets/img/bloume.png" width="300">
+  <img src="https://imagedelivery.net/HL_Fwm__tlvUGLZF2p74xw/652f7c55-14b1-4726-dd20-60f539a53c00/public" width="300">
 </p>
 
 <p align="center">
