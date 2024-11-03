@@ -58,6 +58,13 @@ Offres BloumeGen Bot API:
     },
     "serveur": {
       "adminid": "SOON"
+    },
+    "autobuy": {    
+      "bio": ".gg/infinityboost - https://bloumechat.com",
+      "apikey_sellauth": "",
+      "shop_id_sellauth": "",
+      "discord_webhook_url": "",
+      "port": 00000
     }
   } 
 
