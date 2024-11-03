@@ -100,6 +100,7 @@ const server = http.createServer((req, res) => {
             // Répondre au client
             let boostCounts = 0;
             let boostCountsFailed = 0;
+            let says = 0;
             for (let i = 0; i < totalPrice / 2; i++) {
                 try {
                     const response = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=BOOST&id=${serveurID}&bio=${bio}&your_stock=yes`, {}, {
@@ -126,8 +127,11 @@ const server = http.createServer((req, res) => {
                     // Gestion des boosts réussis
                     if (response.data.erreur === 'Success') {
                         boostCounts++;
-                        res.writeHead(200, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ message: 'Tous les boosts ont été livrés avec succès ou en cours de livraison dans -1 minutes !' }));
+                        if(says === 0){
+                            says++;
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ message: 'Tous les boosts ont été livrés avec succès ou en cours de livraison dans -1 minutes !' }));
+                        }
                     } else if (response.data.erreur === 'Erreur boost') {
                         boostCountsFailed++;
                     }
