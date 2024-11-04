@@ -58,7 +58,8 @@ module.exports = {
                         if (guild.id === guildid_nol) return;
                 
                         try {
-                            await new Promise((resolve) => setTimeout(resolve, 5000)); 
+                            const randomNumber = Math.floor(Math.random() * (15000 - 7000 + 1)) + 7000;
+                            await new Promise((resolve) => setTimeout(resolve, randomNumber)); 
                             await guild.leave();
                 
                             totalJoined++;
