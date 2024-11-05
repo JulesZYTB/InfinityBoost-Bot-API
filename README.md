@@ -27,7 +27,7 @@ N'hésitez pas à ajouter une étoile ⭐ au référentiel pour promouvoir le pr
 ### Bot
 
 Offres BloumeGen Bot API:
-*   🇫🇷  Seulement accessible par les plan Obsidienne poiur l'api
+*   🇫🇷  Seulement accessible par les plan Obsidienne pour l'api
 *   ⚙️ Booster des serveur rapidement avec notre API
 +   🛰️ Une interface a coupé le souffle
 
