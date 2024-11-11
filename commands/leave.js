@@ -3,11 +3,16 @@ const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
 const config = require("../config-bot.json");
 const axios = require('axios');
 let apikey = config.apikey;
+const fs = require('fs');
+const langData = JSON.parse(fs.readFileSync('./api-translate/langs.json', 'utf-8'));
+const lang = config.service.langue_shop;
+const translations = langData[lang];
+let name = config.service.name_shop;
 //Code by JulesZ .
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("leave")
-        .setDescription("Leave tout les serveurs du bot !"),
+        .setDescription(translations['command']['37']),
         
 
         async execute(interaction) {
@@ -20,28 +25,28 @@ module.exports = {
             const row = new MessageActionRow()
                 .addComponents(
                     new MessageButton()
-                    .setLabel('Utilisée le panel')
+                    .setLabel(translations['command']['36'])
                     .setURL(`https://panel.infinityboost.monster/`)
                     .setStyle('LINK')
                 );
             const embed = new MessageEmbed()
                 .setColor("#071b47")
-                .setTitle("Utilisation Interdit")
-                .setDescription("Puisque tu n'es pas l'utilisateur qui possède ce Plan Obsidienne/API, tu ne peux pas utiliser cette commande.")
+                .setTitle(translations['command']['27'])
+                .setDescription(translations['command']['12'])
                 .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                 .setTimestamp()
-                .setFooter("Bot développé par JulesZ");
+                .setFooter(name+" - "+translations['command']['7']+" JulesZ");
 
             return interaction.editReply({ embeds: [embed], components: [row] });
         }
 
             const embed = new MessageEmbed()
             .setColor("#071b47")
-            .setTitle(`Reset des serveurs 0/None`)
-            .setDescription(`Reset de tout les serveur du bot démarage !`)
+            .setTitle(translations['command']['44']+` 0/None`)
+            .setDescription(translations['command']['45'])
             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
             .setTimestamp()
-            .setFooter("Bot développé par JulesZ");
+            .setFooter(name+" - "+translations['command']['7']+" JulesZ");
             await interaction.editReply({ embeds: [embed] });
                   const { Client, Intents } = require("discord.js");
                   const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, , Intents.FLAGS.GUILD_MEMBERS] });
@@ -58,13 +63,12 @@ module.exports = {
                         if (guild.id === guildid_nol) return;
                 
                         try {
-                            const randomNumber = Math.floor(Math.random() * (15000 - 7000 + 1)) + 7000;
-                            await new Promise((resolve) => setTimeout(resolve, randomNumber)); 
+                            await new Promise((resolve) => setTimeout(resolve, 5000)); 
                             await guild.leave();
                 
                             totalJoined++;
                 
-                            let newLog = `[+] Le Bot ${client.user.tag} a quitté le serveur ${guild.name}`;
+                            let newLog = `[+] `+translations['command']['47']+` ${client.user.tag} `+translations['command']['48']+` ${guild.name}`;
                 
                             
                             if (savedLogs.length >= maxLogs) {
@@ -76,11 +80,11 @@ module.exports = {
                 
                             const embed = new MessageEmbed()
                                 .setColor("#071b47")
-                                .setTitle(`Reset des serveurs ${totalJoined}/${count}`)
-                                .setDescription(`Reset de tous les serveurs du bot boost !`)
+                                .setTitle(translations['command']['44']+` ${totalJoined}/${count}`)
+                                .setDescription(translations['command']['46'])
                                 .setImage('https://panel.infinityboost.monster/standard%20(3).gif')
                                 .setTimestamp()
-                                .setFooter("Bot développé par JulesZ");
+                                .setFooter(name+" - "+translations['command']['7']+" JulesZ");
                 
                             
                             if (savedLogs.length > 0) {

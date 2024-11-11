@@ -4,18 +4,23 @@ const config = require("../config-bot.json");
 const axios = require('axios');
 const fs = require("fs");
 const path = require("path");
+const langData = JSON.parse(fs.readFileSync('./api-translate/langs.json', 'utf-8'));
+const lang = config.service.langue_shop;
+const translations = langData[lang];
+let name = config.service.name_shop;
 let apikey = config.apikey;
+
 //Code by JulesZ .
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("stock")
-        .setDescription("Stock du site Panel.InfinityBoost.monster ou du bot")
+        .setDescription(translations['command']['1']+name)
         .addIntegerOption(optionr => 
             optionr.setName("type")
-                .setDescription("Type de stock que vous voulais voir")
+                .setDescription(translations['command']['2'])
                 .setRequired(true)
-                .addChoice(`Site Web`, 1)
-                .addChoice(`Site web YOU`, 2)
+                .addChoice(`1 `+translations['command']['3'], 1)
+                .addChoice(`3 `+translations['command']['3'], 2)
         ) ,
     async execute(interaction, bot) {
         await interaction.deferReply();
@@ -27,34 +32,34 @@ module.exports = {
               const row = new MessageActionRow()
                   .addComponents(
                     new MessageButton()
-                      .setLabel('Voir le site')
+                      .setLabel(translations['command']['4'])
                       .setURL(`https://panel.infinityboost.monster/`)
                       .setStyle('LINK')
                   );
             let non = new MessageEmbed()
             .setColor("#071b47")
-            .setTitle("Erreur APIKey Invalid")
-            .setDescription("Votre APIKey est invalide acheter un plan ou génère une nouvelle API Key!")
+            .setTitle(translations['command']['5'])
+            .setDescription(translations['command']['6'])
             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
             .setTimestamp()
-            .setFooter("Bot développé par JulesZ")
+            .setFooter(name+" - "+translations['command']['7']+" JulesZ")
 
             return interaction.editReply({ embeds: [non], components: [row] })
             } else if(response.data.erreur === 'only API'){
                 const row = new MessageActionRow()
                     .addComponents(
                       new MessageButton()
-                        .setLabel('Voir le site')
+                        .setLabel(translations['command']['4'])
                         .setURL(`https://panel.infinityboost.monster/`)
                         .setStyle('LINK')
                     );
               let non = new MessageEmbed()
               .setColor("#071b47")
-              .setTitle("Erreur only API")
-              .setDescription("Votre APIKey ne peut utiliser que votre stock et non celui de InfinityBoost !")
+              .setTitle(translations['command']['9'])
+              .setDescription(translations['command']['8'])
               .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
               .setTimestamp()
-              .setFooter("Bot développé par JulesZ")
+              .setFooter(name+" - "+translations['command']['7']+" JulesZ")
   
               return interaction.editReply({ embeds: [non], components: [row] })
               } else {
@@ -63,14 +68,12 @@ module.exports = {
             let non = new MessageEmbed()
             .setColor("#071b47")
             .setTitle(`${message}`)
-            .setDescription("Stock du site pour des boosts")
-            .addField(` Boost 1 Mois`, ` **${stocks}  boost**`)
-            .addField(` T0k3n N1tr0 1 Mois`, ` **${stocks / 2}  T0k3n**`)
-            .addField(` Boost 3 Mois`, ` **SOON boost**`)
-            .addField(` T0k3n N1tr0 3 Mois`, ` **SOON T0k3n**`)
+            .setDescription("Stock du "+name)
+            .addField(` Boost 1 `+translations['command']['3'], ` **${stocks}  boost**`)
+            .addField(` T0k3n N1tr0 1 `+translations['command']['3'], ` **${stocks / 2}  T0k3n**`)
             .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
             .setTimestamp()
-            .setFooter("Bot développé par JulesZ")
+            .setFooter(name+" - "+translations['command']['7']+" JulesZ")
 
             return interaction.editReply({ embeds: [non] })
         }
@@ -81,34 +84,34 @@ module.exports = {
         const row = new MessageActionRow()
             .addComponents(
               new MessageButton()
-                .setLabel('Voir le site')
+                .setLabel(translations['command']['4'])
                 .setURL(`https://panel.infinityboost.monster/`)
                 .setStyle('LINK')
             );
       let non = new MessageEmbed()
       .setColor("#071b47")
-      .setTitle("Erreur APIKey Invalid")
-      .setDescription("Votre APIKey est invalide acheter un plan ou génère une nouvelle API Key!")
+      .setTitle(translations['command']['5'])
+      .setDescription(translations['command']['6'])
       .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
       .setTimestamp()
-      .setFooter("Bot développé par JulesZ")
+      .setFooter(name+" - "+translations['command']['7']+" JulesZ")
 
       return interaction.editReply({ embeds: [non], components: [row] })
       } else if(response.data.erreur === 'only API'){
         const row = new MessageActionRow()
             .addComponents(
               new MessageButton()
-                .setLabel('Voir le site')
+                .setLabel(translations['command']['4'])
                 .setURL(`https://panel.infinityboost.monster/`)
                 .setStyle('LINK')
             );
       let non = new MessageEmbed()
       .setColor("#071b47")
-      .setTitle("Erreur only API")
-      .setDescription("Votre APIKey ne peut utiliser que votre stock et non celui de InfinityBoost !")
+      .setTitle(translations['command']['9'])
+      .setDescription(translations['command']['8'])
       .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
       .setTimestamp()
-      .setFooter("Bot développé par JulesZ")
+      .setFooter(name+" - "+translations['command']['7']+" JulesZ")
 
       return interaction.editReply({ embeds: [non], components: [row] })
       } else {
@@ -117,14 +120,12 @@ module.exports = {
       let non = new MessageEmbed()
       .setColor("#071b47")
       .setTitle(`${message}`)
-      .setDescription("Stock du site pour des boosts avec L'API")
-      .addField(` Boost 1 Mois`, ` **${stocks}  boost**`)
-      .addField(` T0k3n N1tr0 1 Mois`, ` **${stocks / 2}  T0k3n**`)
-      .addField(` Boost 3 Mois`, ` **SOON boost**`)
-      .addField(` T0k3n N1tr0 3 Mois`, ` **SOON T0k3n**`)
+      .setDescription("Stock de "+name)
+      .addField(` Boost 3 `+translations['command']['3'], ` **SOON b00st**`)
+      .addField(` T0k3n N1tr0 3 `+translations['command']['3'], ` **SOON T0k3n**`)
       .setImage('https://panel.infinityboost.monster/standard%20(3).gif')
       .setTimestamp()
-      .setFooter("Bot développé par JulesZ")
+      .setFooter(name+" - "+translations['command']['7']+" JulesZ")
 
       return interaction.editReply({ embeds: [non] })
       }

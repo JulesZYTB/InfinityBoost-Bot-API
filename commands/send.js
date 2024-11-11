@@ -2,7 +2,11 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
 const axios = require('axios');
 const config = require("../config-bot.json");
-
+const fs = require('fs');
+const langData = JSON.parse(fs.readFileSync('./api-translate/langs.json', 'utf-8'));
+const lang = config.service.langue_shop;
+const translations = langData[lang];
+let name = config.service.name_shop;
 // API key et client bot
 let apikey = config.apikey;
 let clientbot = config.bot.clientid;
@@ -10,74 +14,67 @@ let clientbot = config.bot.clientid;
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("send")
-        .setDescription("Crée un lien avec les token de votre stock")
+        .setDescription(translations['command']['10'])
         .addIntegerOption(option =>
             option.setName("nombre")
-                .setDescription("Nombre de tokens à envoyer")
+                .setDescription(translations['command']['11'])
                 .setRequired(true)
-        )
-        .addIntegerOption(option =>
-            option.setName("type")
-                .setDescription("Utilisez votre stock")
-                .setRequired(true)
-                .addChoice("Stock site YOU", 3)
         ),
 
     async execute(interaction) {
         await interaction.deferReply();
         const nombre = interaction.options.getInteger("nombre");
-        const type = interaction.options.getInteger("type");
 
         if (!nombre) {
-            return interaction.editReply('Veuillez fournir le nombre de tokens pour envoyer.');
+            return interaction.editReply(translations['command']['26']);
         }
 
         // Détermine le stock à utiliser en fonction du choix de l'utilisateur
-        let your = (type === 3) ? "yes" : "no";
+        let your = "yes";
         const responseuser = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=USER&your_stock=${your}`, {}, {
             timeout: 1000000
         });
         if (responseuser.data.erreur === 'APIKey invalide') {
             const embed = new MessageEmbed()
                 .setColor("#ff0000")
-                .setTitle("Erreur APIKey Invalid")
+                .setTitle(translations['command']['5'])
                 .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                 .setTimestamp()
-                .setFooter("Bot développé par JulesZ");
+                .setFooter(""+translations['command']['7']+" JulesZ");
 
             return interaction.editReply({ embeds: [embed] });
         } else if(responseuser.data.erreur === 'only API'){
             const row = new MessageActionRow()
                 .addComponents(
                   new MessageButton()
-                    .setLabel('Voir le site')
+                    .setLabel(translations['command']['4'])
                     .setURL(`https://panel.infinityboost.monster/`)
                     .setStyle('LINK')
                 );
           let non = new MessageEmbed()
           .setColor("#ff0000")
-          .setTitle("Erreur only API")
-          .setDescription("Votre APIKey ne peut utiliser que votre stock et non celui de InfinityBoost !")
+          .setTitle(translations['command']['9'])
+          .setDescription(translations['command']['8'])
           .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
           .setTimestamp()
-          .setFooter("Bot developpé par BloumeGen")
+          .setFooter(name+" - "+translations['command']['7']+" JulesZ")
 
           return interaction.editReply({ embeds: [non], components: [row] })
           } else if (responseuser.data.user !== interaction.user.username) {
             const row = new MessageActionRow()
                 .addComponents(
                     new MessageButton()
-                    .setLabel('Utilisée le panel')
+                    .setLabel(translations['command']['36'])
                     .setURL(`https://panel.infinityboost.monster/`)
                     .setStyle('LINK')
                 );
             const embed = new MessageEmbed()
                 .setColor("#ff0000")
-                .setTitle("Utilisation Interdit")
-                .setDescription("Puisque tu n'es pas l'utilisateur qui possède ce Plan Obsidienne/API, tu ne peux pas utiliser cette commande.")
+                .setTitle(translations['command']['27'])
+                .setDescription(translations['command']['12'])
                 .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                 .setTimestamp()
-                .setFooter("Bot développé par JulesZ");
+                .setFooter(name+" - "+translations['command']['7']+" JulesZ");
 
             return interaction.editReply({ embeds: [embed], components: [row] });
         }
@@ -91,10 +88,10 @@ module.exports = {
                 const embed = new MessageEmbed()
                     .setColor("#ff0000")
                     .setTitle("Hors Stock")
-                    .setDescription(`InfinityBoost n\'a plus de stock. Merci de patienter !`)
+                    .setDescription(name+translateText("n\'a plus de stock. Merci de patienter !", langue))
                     .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                     .setTimestamp()
-                    .setFooter("Bot développé par JulesZ");
+                    .setFooter(name+" - "+translations['command']['7']+" JulesZ");
 
                 return interaction.editReply({ embeds: [embed] });
             }
@@ -106,7 +103,7 @@ module.exports = {
                     .setDescription(`InfinityBoost n\'a pas assez de stock. Merci de modifier le nombre choisix !`)
                     .setImage('https://panel.infinityboost.monster/standard%20(3).gif') 
                     .setTimestamp()
-                    .setFooter("Bot développé par JulesZ");
+                    .setFooter(name+" - "+translations['command']['7']+" JulesZ");
 
                 return interaction.editReply({ embeds: [embed] });
             }
@@ -118,19 +115,19 @@ module.exports = {
             if (pasteLink) {
                 const embed = new MessageEmbed()
                     .setColor("#0099ff")
-                    .setTitle("Tokens récupérés avec succès !")
-                    .setDescription(`🔹 **Nombre de tokens envoyés :** ${tokensTaken}\n\n🔗 [Lien vers les tokens]( ${pasteLink} )`)
+                    .setTitle(translateText("Tokens récupérés avec succès !", langue))
+                    .setDescription(`🔹 **`+translateText("Nombre de tokens envoyés", langue)+` :** ${tokensTaken}\n\n🔗 [`+translateText("Lien vers les tokens", langue)+`]( ${pasteLink} )`)
                     .setTimestamp()
-                    .setFooter("Bot développé par JulesZ");
+                    .setFooter(name+" - "+translations['command']['7']+" JulesZ");
 
                 await interaction.editReply({ embeds: [embed] });
             } else {
                 const embed = new MessageEmbed()
                     .setColor("#ff0000")
-                    .setTitle("Erreur lors de la sauvegarde des tokens")
-                    .setDescription("Une erreur est survenue lors de l'envoi des tokens.")
+                    .setTitle(translateText("Erreur lors de la sauvegarde des tokens", langue))
+                    .setDescription(translateText("Une erreur est survenue lors de l'envoi des tokens.", langue))
                     .setTimestamp()
-                    .setFooter("Contactez le support de BloumeGen");
+                    .setFooter();
 
                 await interaction.editReply({ embeds: [embed] });
             }
@@ -140,10 +137,10 @@ module.exports = {
             // Gestion des erreurs d'appel API
             const embed = new MessageEmbed()
                 .setColor("#ff0000")
-                .setTitle("Erreur API")
-                .setDescription("Une erreur est survenue lors de l'appel à l'API. Contactez InfinityBoost.")
+                .setTitle(translations['command']['19'])
+                .setDescription(translations['command']['20'])
                 .setTimestamp()
-                .setFooter("Bot développé par JulesZ");
+                .setFooter(name+" - "+translations['command']['7']+" JulesZ");
 
             await interaction.editReply({ embeds: [embed] });
         }
