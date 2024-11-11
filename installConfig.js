@@ -151,7 +151,7 @@ const installConfig = async () => {
   // Sauvegarde de la configuration dans un fichier
   fs.writeFileSync('config-bot.json', JSON.stringify(config, null, 2));
 
-  console.log('La configuration a été sauvegardée dans config.json');
+  console.log('La configuration a été sauvegardée dans config-bot.json');
 };
 
 figlet(text, function(err, asciiArt) {
