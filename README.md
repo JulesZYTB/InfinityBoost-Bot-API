@@ -9,8 +9,8 @@
 
 <p align="center">
     <br/><br/>
-    <a href="https://discord.gg/bloumegen" target="_blank">
-        <img src="https://img.shields.io/discord/1107692347657035819.svg?logo=discord&colorB=7289DA" alt="Discord" />
+    <a href="https://discord.gg/infinityboost" target="_blank">
+        <img src="https://img.shields.io/discord/1295854117779931237.svg?logo=discord&colorB=7289DA" alt="Discord" />
     </a>
 </p>
 
