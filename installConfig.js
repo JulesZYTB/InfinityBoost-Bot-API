@@ -32,9 +32,9 @@ async function askLanguage() {
   return LangueShop;
 }
 // Fonction principale pour installer et configurer
-const LangueShop = await askLanguage();
-
 const installConfig = async () => {
+  const LangueShop = await askLanguage();
+  
   // Demander les paramètres de configuration
   const NameShop = await askQuestion({
     message: 'Entrez le nom de votre shop :',
