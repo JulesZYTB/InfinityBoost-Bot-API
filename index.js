@@ -14,7 +14,7 @@ const text = 'InfinityBoost Bot API';
 figlet(text, function(err, asciiArt) {
   console.log(gradient.rainbow(asciiArt));
   console.log(gradient.rainbow("InfinityBoost Bot API par ") +"JulesZ");
-  console.log(gradient.rainbow("InfinityBoost Bot API Version ") + "V1.5");
+  console.log(gradient.rainbow("InfinityBoost Bot API Version ") + "V3.0");
 });
 await new Promise((resolve) => setTimeout(resolve, 1000));
 let guild = config.bot.guildid;
@@ -56,10 +56,11 @@ for (const file of commandFiles) {
   
 }
 
+require("./autobuy/index");
 
 bot.on("ready", () => {
+  
     console.log(`Le bot ${bot.user.tag} pour les slash commands est connecté`);
-    require("./autobuy/index")
     var items = ['InfinityBoost API by JulesZ - bloumechat.com', '.gg/InfinityBoost API dev by JulesZ - bloumechat.com', '.gg/InfinityBoost API dev by JulesZ - bloumechat.com']; //Merci de pas edit ca peut vraiment nous aider !
 
     var stats = ['online'];
