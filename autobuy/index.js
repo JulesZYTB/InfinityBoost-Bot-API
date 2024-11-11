@@ -79,14 +79,34 @@ const handleBooster = async (queryParams, mode, res) => {
             return handleResponse(res, mode, 'Le statut de la commande n\'est pas "completed".', 200);
         }
 
-        let commandes = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path)) : [];
-        if (commandes.find(cmd => cmd.invoice_id === invoice_id)) {
-            return handleResponse(res, mode, 'Boost déjà livré, contacter le support.', 200);
-        }
+            // Charger le fichier JSON si déjà existant
+            let commandes = [];
+            if (fs.existsSync(path)) {
+                const data = fs.readFileSync(path);
+                commandes = JSON.parse(data);
+            }
 
-        const nouvelleCommande = { invoice_id, email, amount, price, gateway, serveurID, status };
-        commandes.push(nouvelleCommande);
-        fs.writeFileSync(path, JSON.stringify(commandes, null, 2));
+            // Vérifier si l'invoice_id existe déjà
+            const commandeExistante = commandes.find(cmd => cmd.invoice_id === invoice_id);
+            if (commandeExistante) {
+                console.log(`Boost déjà livré, invoice_id: ${invoice_id}.`);
+                return handleResponse(res, mode, 'Boost déjà livré, contacter le support.', 200);
+            }
+
+            // Créer une nouvelle commande
+            const nouvelleCommande = {
+                invoice_id,
+                email,
+                amount,
+                price,
+                gateway,
+                serveurID,
+                status,
+            };
+
+            // Ajouter la commande et sauvegarder dans le fichier JSON
+            commandes.push(nouvelleCommande);
+            fs.writeFileSync(path, JSON.stringify(commandes, null, 2));
 
         let boostCounts = 0;
         let boostCountsFailed = 0;
