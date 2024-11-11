@@ -27,7 +27,7 @@ module.exports = {
         try {
             const type = interaction.options.getInteger("type");
             if(type === 1) {
-            const response = await axios.get(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&nombre=ALL&mode=STOCK`);
+            const response = await axios.get(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&your_stock=yes&nombre=ALL&mode=STOCK`);
             if(response.data.erreur === 'APIKey invalide'){
               const row = new MessageActionRow()
                   .addComponents(
