@@ -48,12 +48,16 @@ Ce que propose BloumeGen Bot API :
 1. Dans le fichier `config.json`, renseignez le token de votre bot Discord.
 2. Toujours dans `config.json`, ajoutez votre apikey sous `apikey` pour activer le bot.
 3. `apikey_sellauth` et `shop_id_sellauth` peuvent être obtenus sur : https://dash.sellauth.com/api.
-4. `discord_webhook_url` : Créez un webhook pour les logs des commandes.
-5. `port` : Indiquez le port de votre Pterodactyl si vous l'utilisez.
-6. Créez un produit simple (non variable) sur votre site de vente :
+4. `discord_webhook_url_command_log` : Créez un webhook pour les logs des commandes.
+5. `discord_webhook_url_console` : Créez un webhook pour les logs de la console.
+6. `host` : Indiquez le nom domaine ou l'ip de votre Pterodactyl si vous l'utilisez.
+7. `port` : Indiquez le port de votre Pterodactyl si vous l'utilisez.
+8. Pour l'installer plus facilement lancé le fichier `InstallConfig.js`.
+9. Créez un produit simple (non variable) sur votre site de vente :
     - Dans les options de livraison, sélectionnez "dynamic".
     - Ajoutez l'URL de votre serveur (IP ou hôte) suivi du port.
-    - Nom du produit : `[Nombre de boosts par commande] boost 1 mois` (exemple ci-dessous).
+    - Nom du produit : `[Nombre de boosts par commande] boost 1/3 mois` (exemple ci-dessous).
+  
 
 <p align="center">
   <img src="https://media.bloumechat.com/media/CAjrolIq7N.png" alt="exemple" /> 
@@ -63,23 +67,53 @@ Ce que propose BloumeGen Bot API :
 Exemple de configuration dans `config.json` :
 ```json
 {
-  "maintenance": "SOON",
-  "apikey": "InfinityBoostAPI_apikey",
+
+  "maintenance": "false",
+
+  "apikey": "",
+
   "bot": {
-    "token": "token de votre bot discord",
-    "guildid": "guild id",
-    "clientid": "client id du bot"
+
+    "token": "",
+
+    "guildid": "",
+
+    "clientid": ""
+
   },
-  "serveur": {
-    "adminid": "SOON"
+
+  "service": {
+
+    "name_shop": "ShopName",
+
+    "langue_shop": "fr"
+
   },
-  "autobuy": {    
+
+  "autobuy": {
+
     "bio": ".gg/infinityboost - https://bloumechat.com",
+
     "apikey_sellauth": "",
+
     "shop_id_sellauth": "",
-    "discord_webhook_url": "",
-    "port": 00000
+
+    "discord_webhook_url_command_log": "",
+
+    "discord_webhook_url_console": "",
+
+    "bio_variable_Custom_Field": "",
+
+    "guildid_variable_Custom_Field": "",
+
+    "orders_command_for_page": 100,
+
+    "host": "",
+
+    "port": 10000
+
   }
+
 }
 ```
 
