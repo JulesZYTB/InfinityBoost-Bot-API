@@ -27,16 +27,17 @@ N'hésitez pas à ajouter une étoile ⭐ au projet pour le soutenir !
 ### Fonctionnalités du bot
 
 Ce que propose BloumeGen Bot API :
-* 🇫🇷 Accessible uniquement pour les utilisateurs du plan Obsidienne de l'API
+* 🇫🇷 Accessible uniquement pour les utilisateurs de l'API
 * ⚙️ Boostez vos serveurs rapidement avec notre API
 * 🛰️ Une interface utilisateur spectaculaire
+* 🤖 Pas besoin de solver pour les captcha on sans occupe a votre place
 
 ### Commandes
 
-* `/boost (guildid:) (type:) (nombre1:) (nombre2:) (bio: à venir)` - Boost via l'API ou avec votre stock (à venir)
-* `/stock (type:)` - Affiche le stock disponible sur le site ou dans le bot
+* `/boost (guildid:) (type:) (nombre1:) (nombre2:) (bio:)` - Boost via l'API
+* `/stock (type:)` - Affiche le stock disponible dans votre API ( bot )
 * `/stats` - Affiche les statistiques du bot
-* `/send (type:)` - Génère un lien pour envoyer des tokens depuis le stock de votre compte
+* `/send (type:)` - Génère un lien pour envoyer des tokens depuis le stock de vitre API ( bot )
 * `/leave` - Fait quitter le bot de tous les serveurs, sauf le sien pour les commandes
 
 ### Gestion du stock
