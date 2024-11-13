@@ -17,7 +17,7 @@ module.exports = {
 
         async execute(interaction) {
             await interaction.deferReply();
-            const responseuser = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=USER`, {}, {
+            const responseuser = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=USER&your_stock=yes`, {}, {
                 timeout: 1000000
             });
           let guildid_nol = interaction.guild.id;
