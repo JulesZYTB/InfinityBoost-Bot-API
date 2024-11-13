@@ -21,13 +21,13 @@ module.exports = {
                 .setRequired(true)
                 .addChoice(`1 `+translations['command']['3'], 1)
                 .addChoice(`3 `+translations['command']['3'], 2)
-        ) ,
+        ),
     async execute(interaction, bot) {
         await interaction.deferReply();
         try {
             const type = interaction.options.getInteger("type");
             if(type === 1) {
-            const response = await axios.get(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&your_stock=yes&nombre=ALL&mode=STOCK`);
+            const response = await axios.get(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&nombre=ALL&mode=STOCK&your_stock=yes&type=1m`);
             if(response.data.erreur === 'APIKey invalide'){
               const row = new MessageActionRow()
                   .addComponents(
@@ -78,7 +78,7 @@ module.exports = {
             return interaction.editReply({ embeds: [non] })
         }
      } else if(type === 2) {
-      const response = await axios.get(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&nombre=ALL&mode=STOCK&your_stock=yes`);
+      const response = await axios.get(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&nombre=ALL&mode=STOCK&your_stock=yes&type=3m`);
       //console.log(response);
       if(response.data.erreur === 'APIKey invalide'){
         const row = new MessageActionRow()
@@ -121,8 +121,8 @@ module.exports = {
       .setColor("#071b47")
       .setTitle(`${message}`)
       .setDescription("Stock de "+name)
-      .addField(` Boost 3 `+translations['command']['3'], ` **SOON b00st**`)
-      .addField(` T0k3n N1tr0 3 `+translations['command']['3'], ` **SOON T0k3n**`)
+      .addField(` Boost 3 `+translations['command']['3'], ` **${stocks} boost**`)
+      .addField(` T0k3n N1tr0 3 `+translations['command']['3'], ` **${stocks / 2} T0k3n**`)
       .setImage('https://panel.infinityboost.monster/standard%20(3).gif')
       .setTimestamp()
       .setFooter(name+" - "+translations['command']['7']+" JulesZ")
