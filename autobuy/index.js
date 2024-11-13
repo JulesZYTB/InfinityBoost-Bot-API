@@ -4,8 +4,6 @@ const fs = require('fs');
 const path = './commandes.json';
 const axios = require('axios');
 const config = require("../config-bot.json");
-const os = require('os');
-const hostname = os.hostname();
 //Code by JulesZ .
 let apikey = config.apikey;
 let portserveur = config.autobuy.port;
@@ -61,52 +59,38 @@ const handleBooster = async (queryParams, mode, res) => {
     let amount = parseInt(queryParams.amount, 10) || 1;
     let serveurID = queryParams[`custom_fields[${guildid_variable_Custom_Field}]`];
     let bio = queryParams[`custom_fields[${bio_variable_Custom_Field}]`] || autobuybio;
-
+    
     try {
         const updateResponse = await axios.get(`https://api.sellauth.com/v1/shops/${shopId}/products/${productId}`, {
             headers: { 'Authorization': `Bearer ${apikey_sellauth}` }
         });
         const products_name = updateResponse.data.name;
         const match = products_name.match(/\[(\d+)\]/);
-        if (!match) {
-            return handleResponse(res, mode, 'Nom du produit mal configuré, [] manquants.', 200);
+        const matchtype = products_name.match(/boost (1|3) Mois/);
+        if (!match || !matchtype) {
+            return handleResponse(res, mode, 'Nom du produit ou type de boost mal configuré, [] manquants ou autre.', 200);
         }
-
+        let typeboost = "";
         const unitPrice = parseInt(match[1], 10);
         const totalPrice = unitPrice * amount;
 
+        if(matchtype === 3) {
+            typeboost = "3m";
+        } else {
+            typeboost = "1m";
+        }
         if (status !== 'completed') {
             return handleResponse(res, mode, 'Le statut de la commande n\'est pas "completed".', 200);
         }
 
-            // Charger le fichier JSON si déjà existant
-            let commandes = [];
-            if (fs.existsSync(path)) {
-                const data = fs.readFileSync(path);
-                commandes = JSON.parse(data);
-            }
+        let commandes = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path)) : [];
+        if (commandes.find(cmd => cmd.invoice_id === invoice_id)) {
+            return handleResponse(res, mode, 'Boost déjà livré, contacter le support.', 200);
+        }
 
-            // Vérifier si l'invoice_id existe déjà
-            const commandeExistante = commandes.find(cmd => cmd.invoice_id === invoice_id);
-            if (commandeExistante) {
-                console.log(`Boost déjà livré, invoice_id: ${invoice_id}.`);
-                return handleResponse(res, mode, 'Boost déjà livré, contacter le support.', 200);
-            }
-
-            // Créer une nouvelle commande
-            const nouvelleCommande = {
-                invoice_id,
-                email,
-                amount,
-                price,
-                gateway,
-                serveurID,
-                status,
-            };
-
-            // Ajouter la commande et sauvegarder dans le fichier JSON
-            commandes.push(nouvelleCommande);
-            fs.writeFileSync(path, JSON.stringify(commandes, null, 2));
+        const nouvelleCommande = { invoice_id, email, amount, price, gateway, serveurID, status };
+        commandes.push(nouvelleCommande);
+        fs.writeFileSync(path, JSON.stringify(commandes, null, 2));
 
         let boostCounts = 0;
         let boostCountsFailed = 0;
@@ -133,14 +117,14 @@ const handleBooster = async (queryParams, mode, res) => {
         // Si le bot est disponible ou pas d'erreur, procéder avec les boosts
         for (let i = 0; i < totalPrice / 2; i++) {
             try {
-                const response = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=BOOST&id=${serveurID}&bio=${bio}&your_stock=yes`, {}, { timeout: 1000000 });
+                const response = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=BOOST&id=${serveurID}&bio=${bio}&your_stock=yes&type=${typeboost}`, {}, { timeout: 1000000 });
                 const { erreur } = response.data;
                 if (['APIKey invalide', 'hors stock'].includes(erreur)) {
                     if(['hors stock'].includes(erreur)) {
                         console.log(`Il n\'y a plus assez de stock, invoice_id: ${invoice_id}.`);
-                        console.log(`Il a déjà reçu ${boostCounts} boost, invoice_id: ${invoice_id}.`);
+                        console.log(`Il a déjà reçu ${boostCounts * 2} boost, invoice_id: ${invoice_id}.`);
                         await sendDiscordNotification(`Il n\'y a plus assez de stock, invoice_id: ${invoice_id}.`, discordWebhookLOG);
-                        await sendDiscordNotification(`Il a déjà reçu ${boostCounts} boost, invoice_id: ${invoice_id}.`, discordWebhookLOG);
+                        await sendDiscordNotification(`Il a déjà reçu ${boostCounts * 2} boost, invoice_id: ${invoice_id}.`, discordWebhookLOG);
                     }
                     return handleResponse(res, mode, `Erreur: ${erreur}.`, 200);
                 }
@@ -155,7 +139,7 @@ const handleBooster = async (queryParams, mode, res) => {
             await sendDiscordNotification(`Nouvelle commande passée : \nInvoice ID: ${invoice_id}\nEmail: ${email}\nNombre de Vérification du bot : ${verifCounts}\nNombre Acheter: ${amount}\nNombre Boost Total: ${unitPrice}\nTotal: ${totalPrice}\nPrix Total: ${price}€\nGateway: ${gateway}`, discordWebhookUrl);
             await sendDiscordNotification(`Tous les boosts ont été livrés, invoice_id: ${invoice_id}.`, discordWebhookLOG);
             console.log(`Tous les boosts ont été livrés, invoice_id: ${invoice_id}.`);
-            handleResponse(res, mode, 'Tous les boosts ont été livrés avec succès ou en cours de livraison.');
+            handleResponse(res, mode, 'Tous les boosts ont été livrés avec succès ou en cours de livraison.', 200);
         }
     } catch (error) {
         console.error(error);
