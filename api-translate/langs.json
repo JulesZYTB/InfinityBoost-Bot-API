@@ -63,7 +63,8 @@
             "62": "de",
             "63": "Utilisation",
             "64": "Affiche les statistiques complètes du bot !",
-            "65": "du"
+            "65": "du",
+            "67": "InfinityBoost n'a pas assez de stock. Merci de modifier le nombre choisix !"
         }
     },
     "en": {
@@ -130,7 +131,8 @@
             "62": "of",
             "63": "Usage",
             "64": "Displays complete bot statistics!",
-            "65": "of"
+            "65": "of",
+            "67": "InfinityBoost does not have enough stock. Please change the number chosen!"
         }
     }
 }
