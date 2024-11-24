@@ -37,14 +37,13 @@ const handleResponse = (res, mode, data, statusCode = 200) => {
 
 const checkIfBotIsAvailable = async (serveurID, retries = 12) => {
     try {
-        const response = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=CHECK_BOT&id=${serveurID}`, {}, { timeout: 1000000 });
+        const response = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=CHECK_BOT&id=${serveurID}&your_stock=yes`, {}, { timeout: 1000000 });
         const { erreur } = response.data;
-
         if (erreur === 'bot') {
             return false;  // Le bot n'est pas encore disponible
+        } else {
+            return true; // Le bot est disponible
         }
-
-        return true; // Le bot est disponible
     } catch (error) {
         console.error('Erreur lors de la vérification du bot:', error);
         return false; // En cas d'erreur, on suppose que le bot n'est pas disponible
@@ -59,7 +58,8 @@ const handleBooster = async (queryParams, mode, res) => {
     let amount = parseInt(queryParams.amount, 10) || 1;
     let serveurID = queryParams[`custom_fields[${guildid_variable_Custom_Field}]`];
     let bio = queryParams[`custom_fields[${bio_variable_Custom_Field}]`] || autobuybio;
-    
+    console.log(`Commande reçu, invoice_id: ${invoice_id}.`);
+    await sendDiscordNotification(`Commande reçu, invoice_id: ${invoice_id}.`, discordWebhookLOG);
     try {
         const updateResponse = await axios.get(`https://api.sellauth.com/v1/shops/${shopId}/products/${productId}`, {
             headers: { 'Authorization': `Bearer ${apikey_sellauth}` }
@@ -68,6 +68,7 @@ const handleBooster = async (queryParams, mode, res) => {
         const match = products_name.match(/\[(\d+)\]/);
         const matchtype = products_name.match(/boost (1|3) Mois/);
         if (!match || !matchtype) {
+            await sendDiscordNotification(`Nom du produit ou type de boost mal configuré, [] manquants ou autre, invoice_id: ${invoice_id}.`, discordWebhookLOG);
             return handleResponse(res, mode, 'Nom du produit ou type de boost mal configuré, [] manquants ou autre.', 200);
         }
         let typeboost = "";
@@ -85,6 +86,7 @@ const handleBooster = async (queryParams, mode, res) => {
 
         let commandes = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path)) : [];
         if (commandes.find(cmd => cmd.invoice_id === invoice_id)) {
+            await sendDiscordNotification(`Boost déjà livré, invoice_id: ${invoice_id}.`, discordWebhookLOG);
             return handleResponse(res, mode, 'Boost déjà livré, contacter le support.', 200);
         }
 
@@ -94,27 +96,51 @@ const handleBooster = async (queryParams, mode, res) => {
 
         let boostCounts = 0;
         let boostCountsFailed = 0;
+        let boosttttt = totalPrice / 2;
 
-        let verifCounts = 0;
         let botAvailable = false;
+        let verifCounts = 0;
+
         while (!botAvailable) {
-            if(verifCounts === 12) {
-                console.log(`Le bot n\'est pas dans votre serveur, Nombre de vérification 12, Temps attendu 60 minutes, invoice_id: ${invoice_id}.`);
-                await sendDiscordNotification(`Le bot n\'est pas dans votre serveur, Nombre de vérification 12, Temps attendu 60 minutes, invoice_id: ${invoice_id}.`, discordWebhookLOG);
-                return handleResponse(res, mode, 'Le bot n\'est pas dans votre serveur, j\'ai attendu 60 minutes pour que vous l\'ajoutée, tempi vous serait donc pas livrée.', 200);
-            }
-            botAvailable = await checkIfBotIsAvailable(serveurID);
-            if (!botAvailable) {
+            try {
+                // Vérification de la limite d'attente
+                if (verifCounts >= 12) {
+                    const message = `Le bot n'est pas dans votre serveur après 12 vérifications (60 minutes), invoice_id: ${invoice_id}.`;
+                    console.log(message);
+                    await sendDiscordNotification(message, discordWebhookLOG);
+                    return handleResponse(
+                        res,
+                        mode,
+                        'Le bot n\'est pas dans votre serveur. J\'ai attendu 60 minutes, la commande est annulée.',
+                        200
+                    );
+                }
+
+                // Vérifie si le bot est disponible dans le serveur
+                botAvailable = await checkIfBotIsAvailable(serveurID);
+
+                if (!botAvailable) {
+                    // Si le bot n'est pas disponible, attendre 5 minutes avant la prochaine vérification
+                    verifCounts++;
+                    const minutesWaited = verifCounts * 5;
+                    const retryMessage = `Bot non disponible. Vérification n° ${verifCounts}/12 après ${minutesWaited} minutes, invoice_id: ${invoice_id}.`;
+                    console.log(retryMessage);
+                    await sendDiscordNotification(retryMessage, discordWebhookLOG);
+
+                    // Attente avant la prochaine tentative (5 minutes)
+                    await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000)); 
+                }
+            } catch (error) {
+                console.error(`Erreur lors de la vérification du bot: ${error.message}, invoice_id: ${invoice_id}.`);
+                await sendDiscordNotification(`Erreur lors de la vérification du bot, invoice_id: ${invoice_id}.`, discordWebhookLOG);
+
+                // Continuer la boucle pour les autres vérifications
                 verifCounts++;
-                let minutesCounst = verifCounts * 10;
-                console.log(`Bot non disponible, vérification dans 5 minutes, verification n° ${verifCounts}/12, Temps d'attente ${minutesCounst} minutes, invoice_id: ${invoice_id}.`);
-                await sendDiscordNotification(`Bot non disponible, vérification dans 5 minutes, verification n° ${verifCounts}, Temps d'attente ${minutesCounst} minutes, invoice_id: ${invoice_id}.`, discordWebhookLOG);
-                await new Promise(resolve => setTimeout(resolve, 300000));  // Attendre 5 minutes
+                await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000)); 
             }
         }
-        
 
-        // Si le bot est disponible ou pas d'erreur, procéder avec les boosts
+		// Si le bot est disponible ou pas d'erreur, procéder avec les boosts
         for (let i = 0; i < totalPrice / 2; i++) {
             try {
                 const response = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=BOOST&id=${serveurID}&bio=${bio}&your_stock=yes&type=${typeboost}`, {}, { timeout: 1000000 });
@@ -134,13 +160,23 @@ const handleBooster = async (queryParams, mode, res) => {
                 boostCountsFailed++;
             }
         }
-
-        if (boostCounts > 0) {
-            await sendDiscordNotification(`Nouvelle commande passée : \nInvoice ID: ${invoice_id}\nEmail: ${email}\nNombre de Vérification du bot : ${verifCounts}\nNombre Acheter: ${amount}\nNombre Boost Total: ${unitPrice}\nTotal: ${totalPrice}\nPrix Total: ${price}€\nGateway: ${gateway}`, discordWebhookUrl);
+		
+        if (boostCounts >= boosttttt) {
+            await sendDiscordNotification(`Nouvelle commande passée : \nInvoice ID: ${invoice_id}\nEmail: ${email}\nNombre de Vérification du bot : ${verifCounts}\nNombre Acheter: ${amount}\nNombre de boost a l'unité: ${unitPrice}\nNombre de Boost Total: ${totalPrice}\nPrix Total: ${price}€\nGateway: ${gateway}`, discordWebhookUrl);
             await sendDiscordNotification(`Tous les boosts ont été livrés, invoice_id: ${invoice_id}.`, discordWebhookLOG);
+            console.log(`Il a reçu ${boostCounts * 2} boost, invoice_id: ${invoice_id}.`);
+            await sendDiscordNotification(`Il a reçu ${boostCounts * 2} boost, invoice_id: ${invoice_id}.`, discordWebhookLOG);
             console.log(`Tous les boosts ont été livrés, invoice_id: ${invoice_id}.`);
-            handleResponse(res, mode, 'Tous les boosts ont été livrés avec succès ou en cours de livraison.', 200);
+            return handleResponse(res, mode, 'Tous les boosts ont été livrés avec succès ou en cours de livraison.', 200);
+        } else {
+            await sendDiscordNotification(`Nouvelle commande passée : \nInvoice ID: ${invoice_id}\nEmail: ${email}\nNombre de Vérification du bot : ${verifCounts}\nNombre Acheter: ${amount}\nNombre de boost a l'unité: ${unitPrice}\nNombre de Boost Total: ${totalPrice}\nPrix Total: ${price}€\nGateway: ${gateway}`, discordWebhookUrl);
+            await sendDiscordNotification(`Tous les boosts non pas été livrés, invoice_id: ${invoice_id}.`, discordWebhookLOG);
+            console.log(`Il y a ${boostCountsFailed * 2} boost non livrée, invoice_id: ${invoice_id}.`);
+            await sendDiscordNotification(`Il y a ${boostCountsFailed * 2} boost non livrée, invoice_id: ${invoice_id}.`, discordWebhookLOG);
+            console.log(`Tous les boosts non pas été livrés, invoice_id: ${invoice_id}.`);
+            return handleResponse(res, mode, 'Erreur de livraison le bot n\'a pas les perms ou les conditions son pas respecté.', 200);
         }
+        
     } catch (error) {
         console.error(error);
         handleResponse(res, mode, 'Erreur interne du serveur', 500);
