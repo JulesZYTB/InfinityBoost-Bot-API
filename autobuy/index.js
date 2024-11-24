@@ -21,7 +21,7 @@ const sendDiscordNotification = async (message, WebhookSend) => {
     try {
         await axios.post(WebhookSend, { content: message });
     } catch (error) {
-        console.error('Erreur lors de l\'envoi du webhook Discord :', error);
+        console.log('Erreur lors de l\'envoi du webhook Discord :', error);
     }
 };
 
@@ -74,12 +74,13 @@ const handleBooster = async (queryParams, mode, res) => {
         let typeboost = "";
         const unitPrice = parseInt(match[1], 10);
         const totalPrice = unitPrice * amount;
-
-        if(matchtype === 3) {
+		const boostDuration = parseInt(matchtype[1], 10); // Récupère la valeur capturée (1 ou 3)
+        if (boostDuration === 3) {
             typeboost = "3m";
-        } else {
+        } else if (boostDuration === 1) {
             typeboost = "1m";
         }
+        
         if (status !== 'completed') {
             return handleResponse(res, mode, 'Le statut de la commande n\'est pas "completed".', 200);
         }
@@ -131,7 +132,7 @@ const handleBooster = async (queryParams, mode, res) => {
                     await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000)); 
                 }
             } catch (error) {
-                console.error(`Erreur lors de la vérification du bot: ${error.message}, invoice_id: ${invoice_id}.`);
+                console.log(`Erreur lors de la vérification du bot: ${error.message}, invoice_id: ${invoice_id}.`);
                 await sendDiscordNotification(`Erreur lors de la vérification du bot, invoice_id: ${invoice_id}.`, discordWebhookLOG);
 
                 // Continuer la boucle pour les autres vérifications
