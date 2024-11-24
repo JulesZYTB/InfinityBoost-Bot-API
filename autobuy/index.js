@@ -74,7 +74,7 @@ const handleBooster = async (queryParams, mode, res) => {
         let typeboost = "";
         const unitPrice = parseInt(match[1], 10);
         const totalPrice = unitPrice * amount;
-		const boostDuration = parseInt(matchtype[1], 10); // Récupère la valeur capturée (1 ou 3)
+	const boostDuration = parseInt(matchtype[1], 10); // Récupère la valeur capturée (1 ou 3)
         if (boostDuration === 3) {
             typeboost = "3m";
         } else if (boostDuration === 1) {
