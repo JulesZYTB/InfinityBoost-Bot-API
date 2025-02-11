@@ -1,10 +1,10 @@
 const http = require('http');
 const url = require('url');
+const axios = require('axios');
 const fs = require('fs');
 const path = './commandes.json';
-const axios = require('axios');
 const config = require("../config-bot.json");
-//Code by JulesZ .
+
 let apikey = config.apikey;
 let portserveur = config.autobuy.port;
 let hostns = config.autobuy.host; 
@@ -13,9 +13,9 @@ let shopId = config.autobuy.shop_id_sellauth;
 let apikey_sellauth = config.autobuy.apikey_sellauth;
 let discordWebhookUrl = config.autobuy.discord_webhook_url_command_log;
 let discordWebhookLOG = config.autobuy.discord_webhook_url_console;
-let guildid_variable_Custom_Field = config.autobuy.guildid_variable_Custom_Field; 
-let bio_variable_Custom_Field = config.autobuy.bio_variable_Custom_Field; 
-let orders_command_for_page = config.autobuy.orders_command_for_page; 
+let orders_command_for_page = config.autobuy.orders_command_for_page;
+let guildid_variable_Custom_Field = config.autobuy.guildid_variable_Custom_Field || "User Discord";
+let bio_variable_Custom_Field = config.autobuy.bio_variable_Custom_Field || "Bio";
 
 const sendDiscordNotification = async (message, WebhookSend) => {
     try {
@@ -39,145 +39,146 @@ const checkIfBotIsAvailable = async (serveurID, retries = 12) => {
     try {
         const response = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=CHECK_BOT&id=${serveurID}&your_stock=yes`, {}, { timeout: 1000000 });
         const { erreur } = response.data;
-        if (erreur === 'bot') {
-            return false;  // Le bot n'est pas encore disponible
-        } else {
-            return true; // Le bot est disponible
-        }
+        return erreur !== 'bot';
     } catch (error) {
         console.error('Erreur lors de la vérification du bot:', error);
-        return false; // En cas d'erreur, on suppose que le bot n'est pas disponible
+        return false;
     }
 };
 
-const handleBooster = async (queryParams, mode, res) => {
-    const { status, email, gateway } = queryParams;
-    let price = parseFloat(queryParams.price);
-    let invoice_id = parseInt(queryParams.invoice_id, 10);
-    let productId = parseInt(queryParams.product_id, 10);
-    let amount = parseInt(queryParams.amount, 10) || 1;
-    let serveurID = queryParams[`custom_fields[${guildid_variable_Custom_Field}]`];
-    let bio = queryParams[`custom_fields[${bio_variable_Custom_Field}]`] || autobuybio;
-    console.log(`Commande reçu, invoice_id: ${invoice_id}.`);
-    await sendDiscordNotification(`Commande reçu, invoice_id: ${invoice_id}.`, discordWebhookLOG);
+const handleBooster = async (requestData, mode, res) => {
     try {
-        const updateResponse = await axios.get(`https://api.sellauth.com/v1/shops/${shopId}/products/${productId}`, {
-            headers: { 'Authorization': `Bearer ${apikey_sellauth}` }
-        });
-        const products_name = updateResponse.data.name;
-        const match = products_name.match(/\[(\d+)\]/);
-        const matchtype = products_name.match(/boost (1|3) Mois/);
-        if (!match || !matchtype) {
-            await sendDiscordNotification(`Nom du produit ou type de boost mal configuré, [] manquants ou autre, invoice_id: ${invoice_id}.`, discordWebhookLOG);
-            return handleResponse(res, mode, 'Nom du produit ou type de boost mal configuré, [] manquants ou autre.', 200);
-        }
-        let typeboost = "";
-        const unitPrice = parseInt(match[1], 10);
-        const totalPrice = unitPrice * amount;
-	const boostDuration = parseInt(matchtype[1], 10); // Récupère la valeur capturée (1 ou 3)
-        if (boostDuration === 3) {
-            typeboost = "3m";
-        } else if (boostDuration === 1) {
-            typeboost = "1m";
-        }
-        
-        if (status !== 'completed') {
-            return handleResponse(res, mode, 'Le statut de la commande n\'est pas "completed".', 200);
+        const item = requestData.item;
+        if (!item) {
+            console.log(`[${new Date().toISOString()}] Données item manquantes`);
+            return handleResponse(res, mode, 'Données item manquantes', 400);
         }
 
+        // Extraction des données spécifiques
+        const amount = parseInt(item.quantity, 10) || 1;
+        const serveurID = item.custom_fields?.[guildid_variable_Custom_Field];
+        const bio = item.custom_fields?.[bio_variable_Custom_Field] || autobuybio;
+        const products_name = item.product?.name;
+
+        console.log(`[${new Date().toISOString()}] Commande reçue pour le serveur: ${serveurID}`);
+        await sendDiscordNotification(`Commande reçu, invoice_id: ${item.invoice_id}, serveur_id: ${serveurID}`, discordWebhookLOG);
+
+        // Vérification des données requises
+        if (!serveurID || !products_name) {
+            console.log(`[${new Date().toISOString()}] Données manquantes: ${!serveurID ? 'serveurID' : 'products_name'}`);
+            return handleResponse(res, mode, 'Données manquantes dans item', 400);
+        }
+
+        // Extraction des informations du nom du produit
+        const match = products_name.match(/\[(\d+)\]/);
+        const matchtype = products_name.match(/boost (1|3) Mois/);
+
+        if (!match || !matchtype) {
+            await sendDiscordNotification(`Nom du produit ou type de boost mal configuré, [] manquants ou autre, invoice_id: ${item.invoice_id}.`, discordWebhookLOG);
+            return handleResponse(res, mode, 'Nom du produit ou type de boost mal configuré, [] manquants ou autre.', 200);
+        }
+
+        const unitPrice = parseInt(match[1], 10);
+        const totalPrice = unitPrice * amount;
+        const boostDuration = parseInt(matchtype[1], 10);
+        const typeboost = boostDuration === 3 ? "3m" : "1m";
+
+        // Vérification des commandes existantes
         let commandes = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path)) : [];
-        if (commandes.find(cmd => cmd.invoice_id === invoice_id)) {
-            await sendDiscordNotification(`Boost déjà livré, invoice_id: ${invoice_id}.`, discordWebhookLOG);
+        if (commandes.find(cmd => cmd.invoice_id === item.invoice_id)) {
+            await sendDiscordNotification(`Boost déjà livré, invoice_id: ${item.invoice_id}.`, discordWebhookLOG);
             return handleResponse(res, mode, 'Boost déjà livré, contacter le support.', 200);
         }
 
-        const nouvelleCommande = { invoice_id, email, amount, price, gateway, serveurID, status };
+        // Sauvegarde de la nouvelle commande
+        const nouvelleCommande = {
+            invoice_id: item.invoice_id,
+            email: item.email,
+            amount,
+            price: item.total_price,
+            gateway: requestData.gateway,
+            serveurID,
+            status: item.status,
+            custom_fields: item.custom_fields,
+            product_name: products_name
+        };
         commandes.push(nouvelleCommande);
         fs.writeFileSync(path, JSON.stringify(commandes, null, 2));
 
         let boostCounts = 0;
         let boostCountsFailed = 0;
         let boosttttt = totalPrice / 2;
-
         let botAvailable = false;
         let verifCounts = 0;
 
-        while (!botAvailable) {
+        // Vérification de la disponibilité du bot
+        while (!botAvailable && verifCounts < 12) {
             try {
-                // Vérification de la limite d'attente
-                if (verifCounts >= 12) {
-                    const message = `Le bot n'est pas dans votre serveur après 12 vérifications (60 minutes), invoice_id: ${invoice_id}.`;
-                    console.log(message);
-                    await sendDiscordNotification(message, discordWebhookLOG);
-                    return handleResponse(
-                        res,
-                        mode,
-                        'Le bot n\'est pas dans votre serveur. J\'ai attendu 60 minutes, la commande est annulée.',
-                        200
-                    );
-                }
-
-                // Vérifie si le bot est disponible dans le serveur
                 botAvailable = await checkIfBotIsAvailable(serveurID);
-
                 if (!botAvailable) {
-                    // Si le bot n'est pas disponible, attendre 5 minutes avant la prochaine vérification
                     verifCounts++;
                     const minutesWaited = verifCounts * 5;
-                    const retryMessage = `Bot non disponible. Vérification n° ${verifCounts}/12 après ${minutesWaited} minutes, invoice_id: ${invoice_id}.`;
-                    console.log(retryMessage);
-                    await sendDiscordNotification(retryMessage, discordWebhookLOG);
-
-                    // Attente avant la prochaine tentative (5 minutes)
-                    await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000)); 
+                    await sendDiscordNotification(`Bot non disponible. Vérification n° ${verifCounts}/12 après ${minutesWaited} minutes, invoice_id: ${item.invoice_id}.`, discordWebhookLOG);
+                    if (verifCounts < 12) {
+                        await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000));
+                    }
                 }
             } catch (error) {
-                console.log(`Erreur lors de la vérification du bot: ${error.message}, invoice_id: ${invoice_id}.`);
-                await sendDiscordNotification(`Erreur lors de la vérification du bot, invoice_id: ${invoice_id}.`, discordWebhookLOG);
-
-                // Continuer la boucle pour les autres vérifications
+                console.error(`Erreur lors de la vérification du bot: ${error.message}, invoice_id: ${item.invoice_id}.`);
+                await sendDiscordNotification(`Erreur lors de la vérification du bot, invoice_id: ${item.invoice_id}.`, discordWebhookLOG);
                 verifCounts++;
-                await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000)); 
+                if (verifCounts < 12) {
+                    await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000));
+                }
             }
         }
 
-		// Si le bot est disponible ou pas d'erreur, procéder avec les boosts
+        if (!botAvailable) {
+            return handleResponse(
+                res,
+                mode,
+                'Le bot n\'est pas dans votre serveur. J\'ai attendu 60 minutes, la commande est annulée.',
+                200
+            );
+        }
+
+        // Application des boosts
         for (let i = 0; i < totalPrice / 2; i++) {
             try {
-                const response = await axios.post(`https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=BOOST&id=${serveurID}&bio=${bio}&your_stock=yes&type=${typeboost}`, {}, { timeout: 1000000 });
+                const response = await axios.post(
+                    `https://panel.infinityboost.monster/api/api?APIKey=${apikey}&mode=BOOST&id=${serveurID}&bio=${bio}&your_stock=yes&type=${typeboost}`,
+                    {},
+                    { timeout: 1000000 }
+                );
                 const { erreur } = response.data;
+                
                 if (['APIKey invalide', 'hors stock'].includes(erreur)) {
-                    if(['hors stock'].includes(erreur)) {
-                        console.log(`Il n\'y a plus assez de stock, invoice_id: ${invoice_id}.`);
-                        console.log(`Il a déjà reçu ${boostCounts * 2} boost, invoice_id: ${invoice_id}.`);
-                        await sendDiscordNotification(`Il n\'y a plus assez de stock, invoice_id: ${invoice_id}.`, discordWebhookLOG);
-                        await sendDiscordNotification(`Il a déjà reçu ${boostCounts * 2} boost, invoice_id: ${invoice_id}.`, discordWebhookLOG);
+                    if (erreur === 'hors stock') {
+                        const message = `Il n'y a plus assez de stock. ${boostCounts * 2} boosts déjà livrés. Invoice_id: ${item.invoice_id}`;
+                        console.log(message);
+                        await sendDiscordNotification(message, discordWebhookLOG);
                     }
                     return handleResponse(res, mode, `Erreur: ${erreur}.`, 200);
                 }
+                
                 if (erreur === 'Success') boostCounts++;
                 else if (erreur === 'Erreur boost') boostCountsFailed++;
             } catch {
                 boostCountsFailed++;
             }
         }
-		
+
+        // Envoi des notifications finales
+        const commandeInfo = `Nouvelle commande passée : \nInvoice ID: ${item.invoice_id}\nEmail: ${item.email}\nNombre de Vérification du bot : ${verifCounts}\nNombre Acheter: ${amount}\nNombre de boost a l'unité: ${unitPrice}\nNombre de Boost Total: ${totalPrice}\nPrix Total: ${item.total_price}€\nGateway: ${requestData.gateway}`;
+        await sendDiscordNotification(commandeInfo, discordWebhookUrl);
+
         if (boostCounts >= boosttttt) {
-            await sendDiscordNotification(`Nouvelle commande passée : \nInvoice ID: ${invoice_id}\nEmail: ${email}\nNombre de Vérification du bot : ${verifCounts}\nNombre Acheter: ${amount}\nNombre de boost a l'unité: ${unitPrice}\nNombre de Boost Total: ${totalPrice}\nPrix Total: ${price}€\nGateway: ${gateway}`, discordWebhookUrl);
-            await sendDiscordNotification(`Tous les boosts ont été livrés, invoice_id: ${invoice_id}.`, discordWebhookLOG);
-            console.log(`Il a reçu ${boostCounts * 2} boost, invoice_id: ${invoice_id}.`);
-            await sendDiscordNotification(`Il a reçu ${boostCounts * 2} boost, invoice_id: ${invoice_id}.`, discordWebhookLOG);
-            console.log(`Tous les boosts ont été livrés, invoice_id: ${invoice_id}.`);
+            await sendDiscordNotification(`Tous les boosts ont été livrés (${boostCounts * 2} boosts), invoice_id: ${item.invoice_id}.`, discordWebhookLOG);
             return handleResponse(res, mode, 'Tous les boosts ont été livrés avec succès ou en cours de livraison.', 200);
         } else {
-            await sendDiscordNotification(`Nouvelle commande passée : \nInvoice ID: ${invoice_id}\nEmail: ${email}\nNombre de Vérification du bot : ${verifCounts}\nNombre Acheter: ${amount}\nNombre de boost a l'unité: ${unitPrice}\nNombre de Boost Total: ${totalPrice}\nPrix Total: ${price}€\nGateway: ${gateway}`, discordWebhookUrl);
-            await sendDiscordNotification(`Tous les boosts non pas été livrés, invoice_id: ${invoice_id}.`, discordWebhookLOG);
-            console.log(`Il y a ${boostCountsFailed * 2} boost non livrée, invoice_id: ${invoice_id}.`);
-            await sendDiscordNotification(`Il y a ${boostCountsFailed * 2} boost non livrée, invoice_id: ${invoice_id}.`, discordWebhookLOG);
-            console.log(`Tous les boosts non pas été livrés, invoice_id: ${invoice_id}.`);
+            await sendDiscordNotification(`${boostCountsFailed * 2} boosts non livrés, invoice_id: ${item.invoice_id}.`, discordWebhookLOG);
             return handleResponse(res, mode, 'Erreur de livraison le bot n\'a pas les perms ou les conditions son pas respecté.', 200);
         }
-        
     } catch (error) {
         console.error(error);
         handleResponse(res, mode, 'Erreur interne du serveur', 500);
@@ -297,23 +298,63 @@ const handleOrders = (res, queryParams) => {
     `);
 };
 
+const server = http.createServer(async (req, res) => {
+    console.log(`[${new Date().toISOString()}] Nouvelle requête reçue: ${req.method} ${req.url}`);
+    
+    if (req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        
+        req.on('end', async () => {
+            try {
+                console.log(`[${new Date().toISOString()}] Corps de la requête POST reçu:`, body);
+                const requestData = JSON.parse(body);
+                const mode = 'json';
+                
+                const parsedUrl = url.parse(req.url, true);
+                if (parsedUrl.pathname === '/booster' && !requestData.event) {
+                    // Pour les requêtes manuelles, on utilise directement les données reçues
+                    console.log(`[${new Date().toISOString()}] Traitement d'une requête /booster manuelle`);
+                    await handleBooster(requestData, mode, res);
+                } else if (requestData.event === 'INVOICE.ITEM.DELIVER-DYNAMIC') {
+                // Pour les webhooks SellAuth
+                    console.log(`[${new Date().toISOString()}] Traitement d'une commande INVOICE.ITEM.DELIVER-DYNAMIC`);
+                    await handleBooster(requestData, mode, res);
+                } else {
+                    console.log(`[${new Date().toISOString()}] Event non supporté:`, requestData.event);
+                    handleResponse(res, mode, 'Event non supporté', 400);
+                }
+            } catch (error) {
+                console.error(`[${new Date().toISOString()}] Erreur parsing JSON:`, error);
+                handleResponse(res, 'json', 'Erreur parsing JSON', 400);
+            }
+        });
+    } else if (req.method === 'GET') {
+        try {
+            const parsedUrl = url.parse(req.url, true);
+            const queryParams = parsedUrl.query;
+            const page = queryParams.page || '1';
+            console.log(`[${new Date().toISOString()}] Requête GET reçue pour ${parsedUrl.pathname}, params:`, queryParams);
 
-
-const server = http.createServer((req, res) => {
-    const parsedUrl = url.parse(req.url, true);
-    const queryParams = parsedUrl.query;
-    const mode = queryParams.mode || 'json';
-    const page = queryParams.page || '1';
-
-    if (parsedUrl.pathname === '/booster') {
-        handleBooster(queryParams, mode, res);
-    } else if (parsedUrl.pathname === '/orders') {
-        handleOrders(res, page);
+            if (parsedUrl.pathname === '/orders') {
+                console.log(`[${new Date().toISOString()}] Traitement d'une requête /orders, page:`, page);
+                handleOrders(res, page);
+            } else {
+                console.log(`[${new Date().toISOString()}] Route non trouvée:`, parsedUrl.pathname);
+                handleResponse(res, 'json', 'Route non trouvée', 404);
+            }
+        } catch (error) {
+            console.error(`[${new Date().toISOString()}] Erreur lors du traitement de la requête GET:`, error);
+            handleResponse(res, 'json', { error: 'Erreur interne du serveur', details: error.message }, 500);
+        }
     } else {
-        handleResponse(res, mode, 'Page non trouvée', 404);
+        console.log(`[${new Date().toISOString()}] Méthode non supportée:`, req.method);
+        handleResponse(res, 'json', 'Méthode non supportée', 405);
     }
 });
 
 server.listen(portserveur, () => {
-    console.log(`Serveur démarré sur http://${hostns}:${portserveur}`);
+    console.log(`[${new Date().toISOString()}] Serveur démarré sur http://${hostns}:${portserveur}`);
 });
